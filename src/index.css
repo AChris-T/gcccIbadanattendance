@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+.railway {
+  font-family: 'Raleway', sans-serif;
+}
+.new {
+  scrollbar-width: none;
+}
+.Aboutpage {
+  background-image: url(./assets/Images/aboutImgs.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.swiper {
+  width: 100%;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.swiper-slide {
+  background-position: center;
+  background-size: cover;
+  width: 300px;
+  height: 300px;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.container {
+  position: relative;
+  overflow: hidden;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background-position: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  animation: animate 50s ease-in-out infinite;
+}
+.outer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+@keyframes animate {
+  0%,
+  100% {
+    background-image: url(../src/assets/Images/bg_1.jpg);
+    opacity: 20;
+  }
+  15% {
+    background-image: url(../src/assets/Images/bg_2.jpg);
+  }
+  25% {
+    background-image: url(../src/assets/Images/bg_3.jpg);
+  }
+  40% {
+    background-image: url(../src/assets/Images/bg_4.jpg);
+  }
+  55% {
+    background-image: url(../src/assets/Images/bg_5.jpg);
+  }
+  60% {
+    background-image: url(../src/assets/Images/bg_6.jpg);
+  }
+  70% {
+    background-image: url(../src/assets/Images/bg_7.jpg);
+  }
+  80% {
+    background-image: url(../src/assets/Images/bg_8.jpg);
+  }
+  90% {
+    background-image: url(../src/assets/Images/bg_9.jpg);
+  }
+  100% {
+    background-image: url(../src/assets/Images/bgN.jpg);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+  }
+}
