@@ -6,8 +6,11 @@ export default function Attendance() {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedService, setSelectedService] = useState('All');
+  //const [selectedService, setSelectedService] = useState('All');
   const [itemsPerPage, setItemsPerPage] = useState(4);
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date().toLocaleString('default', { month: 'long' })
+  );
 
   const getAllUserData = async () => {
     try {
@@ -46,14 +49,16 @@ export default function Attendance() {
   }, []);
 
   useEffect(() => {
-    if (selectedService === 'All') {
-      setFilteredUsers(users);
-    } else {
-      const filtered = users.filter((user) => user.Service === selectedService);
-      setFilteredUsers(filtered);
-    }
+    const filtered = users.filter((user) => {
+      const userMonth = new Date(user.Key).toLocaleString('default', {
+        month: 'long',
+      });
+      return userMonth === selectedMonth;
+    });
+
+    setFilteredUsers(filtered);
     setCurrentPage(1);
-  }, [selectedService, users]);
+  }, [selectedMonth, users]);
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -77,25 +82,31 @@ export default function Attendance() {
       <div className="overflow-x-auto max-w-full w-full mt-[20px]">
         <div className="bg-[#2E2E44] w-full p-5 rounded-lg min-w-full">
           <div className="flex flex-col-reverse items-start justify-between w-full gap-4 md:flex-row md:items-center">
-            <div className="flex flex-wrap w-full gap-3">
-              <div className="h-14 py-3 rounded-lg px-2 font-medium text-sm border-[#444466] border bg-[#1E1E2F]">
+            <div className="flex flex-wrap items-center justify-center w-full gap-3 md:justify-start">
+              <div className="h-14 py-3  rounded-lg px-2 font-medium text-sm border-[#444466] border bg-[#1E1E2F]">
                 <select
                   className="bg-[#1E1E2F] pr-5 text-white w-full h-full focus:outline-none"
-                  value={selectedService}
-                  onChange={(e) => setSelectedService(e.target.value)}
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
                 >
-                  <option value="All">All Services</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Sunday">Sunday</option>
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const month = new Date(0, i).toLocaleString('default', {
+                      month: 'long',
+                    });
+                    return (
+                      <option key={month} value={month}>
+                        {month}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
-              <div className="h-14 py-3 rounded-lg px-2 font-medium text-sm border-[#444466] border bg-[#1E1E2F]">
+              {/*  <div className="h-14 py-3 rounded-lg px-2 font-medium text-sm border-[#444466] border bg-[#1E1E2F]">
                 <input
                   type="date"
                   className="bg-[#1E1E2F] text-white w-full h-full focus:outline-none"
                 />
-              </div>
+              </div> */}
             </div>
             <div className="flex items-center justify-center w-full gap-2 md:justify-end">
               <h3 className="text-white">Current Streak:</h3>
@@ -109,39 +120,50 @@ export default function Attendance() {
           <div className="mt-8 w-full overflow-x-auto lg:h-full h-[400px]">
             <div className="rounded-lg ">
               <table className="w-full min-w-[1000px] max-w-[1240px] text-sm text-left rounded-lg border-[1px] border-[#444466]">
-                <thead className="text-white h-[48px] bg-[#1E1E2F]">
+                <thead className="text-white  h-[48px] bg-[#1E1E2F]">
                   <tr className="">
-                    <th className="px-4 py-2">Date</th>
+                    <th className="px-4 pl-[30px] py-2">Date</th>
                     <th className="px-4 py-2">Service</th>
                     <th className="px-4 py-2">Service Time</th>
                     <th className="px-4 py-2">Checked in Time</th>
-                    <th className="px-4 py-2">Email</th>
+                    {/*                     <th className="px-4 py-2">Email</th>
+                     */}{' '}
                   </tr>
                 </thead>
                 <tbody>
-                  {currentUsers.map((user) => (
-                    <tr key={user.id} className="text-white">
-                      <td className="px-4 text-sm py-7">{user.Key}</td>
-                      <td className="px-4 text-sm py-7">
-                        {user.Service} Service
-                      </td>
-                      <td className="px-4 text-sm py-7">
-                        {user.Service === 'Friday'
-                          ? '5:30pm'
-                          : '' || user.Service === 'Tuesday'
-                          ? '5:15pm'
-                          : '' || user.Service === 'Sunday'
-                          ? '8:00am'
-                          : ''}
-                      </td>
-                      <td className="px-4 text-sm py-7">
-                        {formatTime(user.Time)}
-                      </td>
-                      <td className="px-4 text-sm w-[250px] py-7">
-                        {user.Email}
+                  {currentUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="py-10 text-center text-white">
+                        Data not found
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    currentUsers.map((user) => (
+                      <tr key={user.id} className="text-white">
+                        <td className="px-4 text-sm py-7 pl-[30px]">
+                          {user.Key}
+                        </td>
+                        <td className="px-4 text-sm py-7">
+                          {user.Service} Service
+                        </td>
+                        <td className="px-4 text-sm py-7">
+                          {user.Service === 'Friday'
+                            ? '5:30pm'
+                            : '' || user.Service === 'Tuesday'
+                            ? '5:15pm'
+                            : '' || user.Service === 'Sunday'
+                            ? '8:00am'
+                            : ''}
+                        </td>
+                        <td className="px-4 w-[250px] text-sm py-7">
+                          {formatTime(user.Time)}
+                        </td>
+                        {/*   <td className="px-4 text-sm w-[250px] py-7">
+                        {user.Email}
+                      </td> */}
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

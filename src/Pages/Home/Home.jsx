@@ -13,6 +13,8 @@ import animationData from '../../assets/Animation.json';
 import { motion } from 'framer-motion';
 import HandIcon from '../../assets/HandIcon';
 import CheckedIcon from '../../assets/CheckedIcon';
+import isoWeek from 'dayjs/plugin/isoWeek';
+dayjs.extend(isoWeek);
 
 const Home = ({ isMarked, setIsMarked }) => {
   const postDataUrl = import.meta.env.VITE_APP_POST_DATA;
@@ -20,11 +22,11 @@ const Home = ({ isMarked, setIsMarked }) => {
   const [userTimes, setUserTimes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingUserAttendance, setLoadingUserAttendance] = useState(false);
+  const [clockInTime, setClockInTime] = useState('--/--');
   const [Marked, setMarked] = useState(false);
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
   const [isReading, setIsReading] = useState(false);
-  const formattedTime = dayjs().format('hh:mm A ');
 
   dayjs.extend(customParseFormat);
 
@@ -32,13 +34,17 @@ const Home = ({ isMarked, setIsMarked }) => {
     time: dayjs().format('HH:mm A'),
     day: dayjs().format('dddd'),
     date: dayjs().format('DD'),
-    month: dayjs().format('MMM'),
+    month: dayjs().format('MMMM'), // Full month name like January
     year: dayjs().format('YYYY'),
+    week: Math.floor(dayjs().diff(dayjs().startOf('month'), 'day') / 7) + 1, // Week 1–5 within the month
   };
   const uniqueKey = `${current.day}-${current.date}-${current.month}-${current.year}`;
 
   const handleButtonClick = async () => {
     setLoading(true);
+    const timeNow = dayjs().format('hh:mm A'); // freeze time at click
+    setClockInTime(timeNow); // update UI
+    localStorage.setItem('GCCC_CLOCK_IN_TIME', timeNow); // ✅ store it
     setIsReading(true);
     setTimeout(() => {
       setIsReading(false);
@@ -53,6 +59,8 @@ const Home = ({ isMarked, setIsMarked }) => {
       formData.append('Phone', authUser.PhoneNumber);
       formData.append('Email', authUser.Email);
       formData.append('Service', current.day);
+      formData.append('Month', current.month);
+      formData.append('Week', current.week);
       formData.append('Date', new Date());
       formData.append('Time', current.time);
       formData.append('Key', uniqueKey);
@@ -74,7 +82,7 @@ const Home = ({ isMarked, setIsMarked }) => {
   };
 
   const handleConfirm = () => {
-    window.location.href = '/'; // Replace with your actual home page route
+    window.location.href = '/';
   };
 
   const showAttendanceButton = () => {
@@ -94,8 +102,9 @@ const Home = ({ isMarked, setIsMarked }) => {
       );
       const alreadyMarked = getAllAttend.find((user) => user.Key == uniqueKey);
       if (alreadyMarked) {
-        setMarked(false);
-        setIsMarked(false); //note this
+        setMarked(true);
+        setIsMarked(true);
+        setClockInTime(dayjs().format('hh:mm A'));
       }
       setUserTimes(getAllAttend);
       setLoadingUserAttendance(false);
@@ -108,6 +117,10 @@ const Home = ({ isMarked, setIsMarked }) => {
 
   useEffect(() => {
     userAttendance();
+    const storedClockInTime = localStorage.getItem('GCCC_CLOCK_IN_TIME');
+    if (storedClockInTime && isMarked) {
+      setClockInTime(storedClockInTime);
+    }
   }, []);
 
   return (
@@ -134,7 +147,7 @@ const Home = ({ isMarked, setIsMarked }) => {
             <div className="flex flex-col items-center gap-1">
               {showAttendanceButton() ? (
                 <div className="p-3 bg-[#2E2E44] rounded-full bg- ">
-                  <div className="bg-[#3A4D70] rounded-full">
+                  <div className="bg-[#3A4D70] rounded-full  animate-pulse delay-150">
                     <motion.div
                       onClick={handleButtonClick}
                       className="rounded-full bg-[#4C8EFF] p-9 cursor-pointer relative"
@@ -147,11 +160,8 @@ const Home = ({ isMarked, setIsMarked }) => {
                         type: 'spring',
                       }}
                     >
-                      {/* Outer pulsating circles */}
-                      <span className="absolute inset-1 rounded-full  border-4 border-[#0f121b] opacity-90 animate-ping delay-150"></span>
-                      <span className="absolute inset-1 rounded-full border-4 border-[#06080e] opacity-90 animate-ping delay-150"></span>
-
-                      {/* Icon */}
+                      <span className="absolute inset-1 rounded-full  border-4 border-[#202a46] opacity-90 animate-ping delay-1000"></span>
+                      <span className="absolute inset-1 rounded-full border-4 border-[#172346] opacity-90 animate-ping delay-10000"></span>
                       <HandIcon />
                     </motion.div>
                   </div>
@@ -169,14 +179,16 @@ const Home = ({ isMarked, setIsMarked }) => {
                   ? 'Attendance Taken'
                   : 'Tap the button to log your attendance'}
               </h3>
-              <p className="text-sm font-semibold text-white">Clock In Time</p>
-              <p className="text-white">{formattedTime}</p>
+              <p className="my-3 text-sm font-semibold text-white">
+                Clock In Time
+              </p>
+              <p className="text-white">{clockInTime}</p>
             </div>
             <div className="flex items-center gap-2">{/*  */}</div>
           </div>
         )}
       </div>
-      <Modal open={open} className="flex justify-center" onClose={handleClose}>
+      {/* <Modal open={open} className="flex justify-center" onClose={handleClose}>
         <Box className="max-w-sm p-6 m-auto bg-white rounded-md shadow-md">
           <Typography className="my-4">
             Thank you for confirming your attendance
@@ -187,7 +199,7 @@ const Home = ({ isMarked, setIsMarked }) => {
             </Button>
           </div>
         </Box>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };
