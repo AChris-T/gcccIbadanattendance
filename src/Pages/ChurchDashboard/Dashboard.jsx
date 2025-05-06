@@ -55,7 +55,7 @@ const Dashboard = ({ isMarked, setIsMarked }) => {
               style={({ isActive }) => {
                 return {
                   fontWeight: isActive ? '500' : '500',
-                  color: isActive ? '#fff' : '#151529',
+                  color: isActive ? '#fff' : '#ffffffa8',
                 };
               }}
             >
@@ -65,11 +65,11 @@ const Dashboard = ({ isMarked, setIsMarked }) => {
             <NavLink
               to="attendance"
               //onClick={!setIsMarked}
-              className="flex flex-col items-center   rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium  "
+              className="flex flex-col items-center  rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium  "
               style={({ isActive }) => {
                 return {
                   fontWeight: isActive ? '500' : '500',
-                  color: isActive ? '#fff' : '#151529',
+                  color: isActive ? '#fff' : '#ffffffa8',
                 };
               }}
             >
@@ -85,7 +85,7 @@ const Dashboard = ({ isMarked, setIsMarked }) => {
               style={({ isActive }) => {
                 return {
                   fontWeight: isActive ? '500' : '500',
-                  color: isActive ? '#fff' : '#151529',
+                  color: isActive ? '#fff' : '#ffffffa8',
                 };
               }}
             >

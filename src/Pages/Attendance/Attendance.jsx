@@ -108,10 +108,10 @@ export default function Attendance() {
                 />
               </div> */}
             </div>
-            <div className="flex items-center justify-center w-full gap-2 md:justify-end">
+            <div className="items-center justify-center hidden w-full gap-2 md:flex md:justify-end">
               <h3 className="text-white">Current Streak:</h3>
-              <div className="bg-[#FF7242] border-2 border-[#FFC857] rounded-full w-[111px] h-[44px] flex items-center justify-center text-white font-semibold">
-                5 Days 🔥
+              <div className="bg-[#FF7242] border-2 border-[#FFC857] rounded-full w-[151px] h-[44px] flex items-center justify-center text-white font-semibold">
+                Coming Soon 🔥
               </div>
             </div>
           </div>
