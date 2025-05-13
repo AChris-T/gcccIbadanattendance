@@ -19,6 +19,22 @@ import 'react-toastify/dist/ReactToastify.css';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
+// Define routes outside of component to ensure they're always available
+const ROUTES = {
+  physical: {
+    base: '/physical',
+    login: '/physical/login',
+    home: '/physical/home',
+    attendance: '/physical/attendance'
+  },
+  online: {
+    base: '/online',
+    login: '/online/login',
+    home: '/online/home',
+    attendance: '/online/attendance'
+  }
+};
+
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const getDataUrl = import.meta.env.VITE_APP_GET_DATA;
@@ -26,44 +42,40 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const routes = {
-    physical: {
-      base: '/physical',
-      login: '/physical/login',
-      home: '/physical/home',
-      attendance: '/physical/attendance',
-    },
-    online: {
-      base: '/online',
-      login: '/online/login',
-      home: '/online/home',
-      attendance: '/online/attendance',
-    },
-  };
-
+  // Get current route type from path
   const getRouteType = (path) => {
-    if (path.startsWith(routes.physical.base)) return 'physical';
-    if (path.startsWith(routes.online.base)) return 'online';
+    if (!path) return null;
+    if (path.startsWith(ROUTES.physical.base)) return 'physical';
+    if (path.startsWith(ROUTES.online.base)) return 'online';
     return null;
   };
 
+  // Initialize app and handle stored user
   useEffect(() => {
     AOS.init();
-    const storedUser = localStorage.getItem('GCCC_ATTENDANCE');
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setLoggedInUser(userData);
-
-      const currentPath = location.pathname;
-      const routeType = getRouteType(currentPath);
-
-      if (routeType) {
-        if (currentPath === routes[routeType].login) {
-          navigate(routes[routeType].home);
+    try {
+      const storedUser = localStorage.getItem('GCCC_ATTENDANCE');
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        setLoggedInUser(userData);
+        
+        const currentPath = location.pathname;
+        const routeType = getRouteType(currentPath);
+        
+        // If user is on a specific route type, stay there
+        if (routeType) {
+          if (currentPath === ROUTES[routeType].login) {
+            navigate(ROUTES[routeType].home);
+          }
+        } else {
+          // Default to user's stored type
+          navigate(ROUTES[userData.attendanceType]?.home || ROUTES.physical.home);
         }
-      } else {
-        navigate(routes[userData.attendanceType].home);
       }
+    } catch (error) {
+      console.error('Error initializing app:', error);
+      // Handle initialization error gracefully
+      navigate(ROUTES.physical.login);
     }
   }, [location.pathname]);
 
@@ -79,6 +91,7 @@ function App() {
       );
 
       if (user) {
+        // Determine attendance type from current URL
         const routeType = getRouteType(location.pathname);
         if (!routeType) {
           toast.error('Invalid access path', {
@@ -90,18 +103,19 @@ function App() {
         const userWithType = { ...user, attendanceType: routeType };
         setLoggedInUser(userWithType);
         localStorage.setItem('GCCC_ATTENDANCE', JSON.stringify(userWithType));
-
+        
         toast.success('Login successful', {
           position: 'top-right',
         });
-
-        navigate(routes[routeType].home);
+        
+        navigate(ROUTES[routeType].home);
       } else {
         toast.error('Invalid Email/Phone Number', {
           position: 'top-right',
         });
       }
     } catch (error) {
+      console.error('Login error:', error);
       toast.error('Login failed. Please try again.', {
         position: 'top-right',
       });
@@ -109,20 +123,27 @@ function App() {
   };
 
   const handleLogout = (attendanceType) => {
-    localStorage.removeItem('GCCC_ATTENDANCE');
-    setLoggedInUser(null);
-    navigate(routes[attendanceType].login);
-    toast.success('Logged out successfully', {
-      position: 'top-right',
-    });
+    try {
+      localStorage.removeItem('GCCC_ATTENDANCE');
+      setLoggedInUser(null);
+      navigate(ROUTES[attendanceType].login);
+      toast.success('Logged out successfully', {
+        position: 'top-right',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Error during logout. Please try again.', {
+        position: 'top-right',
+      });
+    }
   };
 
   const ProtectedRoute = ({ element, attendanceType }) => {
     if (!loggedInUser) {
-      return <Navigate to={routes[attendanceType].login} replace />;
+      return <Navigate to={ROUTES[attendanceType].login} replace />;
     }
     if (loggedInUser.attendanceType !== attendanceType) {
-      return <Navigate to={routes[loggedInUser.attendanceType].home} replace />;
+      return <Navigate to={ROUTES[loggedInUser.attendanceType].home} replace />;
     }
     return element;
   };
@@ -132,17 +153,17 @@ function App() {
       <Routes>
         {/* Physical Member Routes */}
         <Route
-          path={routes.physical.login}
+          path={ROUTES.physical.login}
           element={
             loggedInUser ? (
-              <Navigate to={routes.physical.home} replace />
+              <Navigate to={ROUTES.physical.home} replace />
             ) : (
               <Login onLogin={handleLogin} />
             )
           }
         />
         <Route
-          path={`${routes.physical.base}/*`}
+          path={`${ROUTES.physical.base}/*`}
           element={
             <ProtectedRoute
               element={
@@ -158,29 +179,23 @@ function App() {
             />
           }
         >
-          <Route
-            path="home"
-            element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />}
-          />
-          <Route
-            path="attendance"
-            element={<Attendance attendanceType="physical" />}
-          />
+          <Route path="home" element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />} />
+          <Route path="attendance" element={<Attendance attendanceType="physical" />} />
         </Route>
 
         {/* Online Member Routes */}
         <Route
-          path={routes.online.login}
+          path={ROUTES.online.login}
           element={
             loggedInUser ? (
-              <Navigate to={routes.online.home} replace />
+              <Navigate to={ROUTES.online.home} replace />
             ) : (
               <Login onLogin={handleLogin} />
             )
           }
         />
         <Route
-          path={`${routes.online.base}/*`}
+          path={`${ROUTES.online.base}/*`}
           element={
             <ProtectedRoute
               element={
@@ -196,14 +211,8 @@ function App() {
             />
           }
         >
-          <Route
-            path="home"
-            element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />}
-          />
-          <Route
-            path="attendance"
-            element={<Attendance attendanceType="online" />}
-          />
+          <Route path="home" element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />} />
+          <Route path="attendance" element={<Attendance attendanceType="online" />} />
         </Route>
 
         {/* Default Route */}
@@ -214,7 +223,7 @@ function App() {
               <h1 className="text-2xl font-bold">Error 404: Page Not Found</h1>
               <button
                 className="px-6 py-4 text-lg text-white bg-purple-600 border rounded-lg"
-                onClick={() => navigate(routes.physical.home)}
+                onClick={() => navigate(ROUTES.physical.home)}
               >
                 Back to Home
               </button>
