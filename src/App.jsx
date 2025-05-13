@@ -53,30 +53,63 @@ function App() {
   // Initialize app and handle stored user
   useEffect(() => {
     AOS.init();
-    try {
-      const storedUser = localStorage.getItem('GCCC_ATTENDANCE');
-      if (storedUser) {
-        const userData = JSON.parse(storedUser);
-        setLoggedInUser(userData);
-        
+    
+    const initializeApp = () => {
+      try {
+        const storedUser = localStorage.getItem('GCCC_ATTENDANCE');
         const currentPath = location.pathname;
         const routeType = getRouteType(currentPath);
+
+        // If no stored user, redirect to appropriate login page
+        if (!storedUser) {
+          if (routeType) {
+            navigate(ROUTES[routeType].login);
+          } else {
+            // Default to physical login if no route type
+            navigate(ROUTES.physical.login);
+          }
+          return;
+        }
+
+        // Parse stored user data
+        const userData = JSON.parse(storedUser);
         
-        // If user is on a specific route type, stay there
+        // Validate stored user data
+        if (!userData || !userData.attendanceType) {
+          localStorage.removeItem('GCCC_ATTENDANCE');
+          navigate(ROUTES.physical.login);
+          return;
+        }
+
+        // If user is on a specific route type
         if (routeType) {
+          // If user type doesn't match route type, redirect to correct section
+          if (userData.attendanceType !== routeType) {
+            navigate(ROUTES[userData.attendanceType].home);
+            return;
+          }
+          
+          // If on login page, redirect to home
           if (currentPath === ROUTES[routeType].login) {
             navigate(ROUTES[routeType].home);
+            return;
           }
         } else {
-          // Default to user's stored type
-          navigate(ROUTES[userData.attendanceType]?.home || ROUTES.physical.home);
+          // If no specific route type, redirect to user's section
+          navigate(ROUTES[userData.attendanceType].home);
+          return;
         }
+
+        // Set logged in user if all checks pass
+        setLoggedInUser(userData);
+      } catch (error) {
+        console.error('Error initializing app:', error);
+        localStorage.removeItem('GCCC_ATTENDANCE');
+        navigate(ROUTES.physical.login);
       }
-    } catch (error) {
-      console.error('Error initializing app:', error);
-      // Handle initialization error gracefully
-      navigate(ROUTES.physical.login);
-    }
+    };
+
+    initializeApp();
   }, [location.pathname]);
 
   const handleLogin = async (username, password) => {
