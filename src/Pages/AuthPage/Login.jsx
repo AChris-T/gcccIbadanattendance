@@ -6,6 +6,7 @@ import logo from '../../assets/Images/gcc.png';
 import { ClipLoader } from 'react-spinners';
 import { NavLink } from 'react-router-dom';
 
+
 const Login = ({ onLogin }) => {
   const [username, setusername] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,9 +21,9 @@ const Login = ({ onLogin }) => {
   return (
     <div>
       <div className=" max-w-[1940px]  bg-[#24244e] mx-auto  overflow-x-hidden">
-        <div className="flex items-center justify-center w-full px-2 align-middle ">
+        <div className="flex items-center justify-center w-full px-4 align-middle md:px-0 ">
           <div className="flex w-full justify-center items-center h-[100vh]">
-            <div className="w-full flex flex-col items-center  railway">
+            <div className="flex flex-col items-center w-full railway">
               <NavLink to="/" className="">
                 <img src={logo} alt="" className="w-[150px]" />
               </NavLink>

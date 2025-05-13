@@ -47,11 +47,6 @@ function App() {
           user.Email.toLowerCase() == lowercaseUsername ||
           user['Phone Number'] == username
       );
-      /*   (user) =>
-          (user.Email.toLowerCase() == lowercaseUsername &&
-            user["Phone Number"] == password) ||
-          (user["Phone Number"] == username && user["Phone Number"] == password)
-      ); */
 
       if (user) {
         setLoggedInUser(user);
@@ -78,14 +73,6 @@ function App() {
   return (
     <>
       <Routes>
-        {/*  <Route path="/" element={<LandingPage loggedInUser={loggedInUser} />}>
-          <Route path="/" element={<HomeDetails />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/forms" element={<Forms />} />
-          <Route path="/events" element={<Stream />} />
-          <Route path="/give" element={<Give />} />
-          <Route path="/home/resources" element={<Resources />} />
-        </Route> */}
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
         <Route
@@ -109,11 +96,6 @@ function App() {
           <Route path="/attendance" element={<Attendance />} />
         </Route>
 
-        {/*   {/*     <Route path="/login">
-        <Route index element={<Login onLogin={handleLogin}/>}/>
-        <Route path='login' element={<Login/>}/>
-{/*      <Route path='Register' element={<Register/>}/>
-    </Route> */}
         <Route
           path="*"
           element={
@@ -139,3 +121,25 @@ function App() {
 }
 
 export default App;
+/*   (user) =>
+          (user.Email.toLowerCase() == lowercaseUsername &&
+            user["Phone Number"] == password) ||
+          (user["Phone Number"] == username && user["Phone Number"] == password)
+      ); */
+{
+  /*   {/*     <Route path="/login">
+        <Route index element={<Login onLogin={handleLogin}/>}/>
+        <Route path='login' element={<Login/>}/>
+{/*      <Route path='Register' element={<Register/>}/>
+    </Route> */
+}
+{
+  /*  <Route path="/" element={<LandingPage loggedInUser={loggedInUser} />}>
+          <Route path="/" element={<HomeDetails />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/forms" element={<Forms />} />
+          <Route path="/events" element={<Stream />} />
+          <Route path="/give" element={<Give />} />
+          <Route path="/home/resources" element={<Resources />} />
+        </Route> */
+}

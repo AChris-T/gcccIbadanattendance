@@ -34,7 +34,7 @@ const Dashboard = ({ isMarked, setIsMarked }) => {
     <div
       className={`max-w-[1940px] ${
         isMarked ? `bg-[#24244e]` : 'bg-[#24244e]'
-      } mx-auto shadow-card`}
+      } mx-auto shadow-card h-full`}
     >
       <div className="flex flex-col ">
         <div className="flex flex-col h-[100dvh] justify-between w-full">
