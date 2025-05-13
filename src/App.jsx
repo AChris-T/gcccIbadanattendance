@@ -19,20 +19,19 @@ import 'react-toastify/dist/ReactToastify.css';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-// Define routes outside of component to ensure they're always available
 const ROUTES = {
   physical: {
     base: '/physical',
     login: '/physical/login',
     home: '/physical/home',
-    attendance: '/physical/attendance'
+    attendance: '/physical/attendance',
   },
   online: {
     base: '/online',
     login: '/online/login',
     home: '/online/home',
-    attendance: '/online/attendance'
-  }
+    attendance: '/online/attendance',
+  },
 };
 
 function App() {
@@ -42,7 +41,6 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get current route type from path
   const getRouteType = (path) => {
     if (!path) return null;
     if (path.startsWith(ROUTES.physical.base)) return 'physical';
@@ -50,57 +48,44 @@ function App() {
     return null;
   };
 
-  // Initialize app and handle stored user
   useEffect(() => {
     AOS.init();
-    
+
     const initializeApp = () => {
       try {
         const storedUser = localStorage.getItem('GCCC_ATTENDANCE');
         const currentPath = location.pathname;
         const routeType = getRouteType(currentPath);
 
-        // If no stored user, redirect to appropriate login page
         if (!storedUser) {
           if (routeType) {
             navigate(ROUTES[routeType].login);
           } else {
-            // Default to physical login if no route type
             navigate(ROUTES.physical.login);
           }
           return;
         }
-
-        // Parse stored user data
         const userData = JSON.parse(storedUser);
-        
-        // Validate stored user data
         if (!userData || !userData.attendanceType) {
           localStorage.removeItem('GCCC_ATTENDANCE');
           navigate(ROUTES.physical.login);
           return;
         }
 
-        // If user is on a specific route type
         if (routeType) {
-          // If user type doesn't match route type, redirect to correct section
           if (userData.attendanceType !== routeType) {
             navigate(ROUTES[userData.attendanceType].home);
             return;
           }
-          
-          // If on login page, redirect to home
+
           if (currentPath === ROUTES[routeType].login) {
             navigate(ROUTES[routeType].home);
             return;
           }
         } else {
-          // If no specific route type, redirect to user's section
           navigate(ROUTES[userData.attendanceType].home);
           return;
         }
-
-        // Set logged in user if all checks pass
         setLoggedInUser(userData);
       } catch (error) {
         console.error('Error initializing app:', error);
@@ -124,7 +109,6 @@ function App() {
       );
 
       if (user) {
-        // Determine attendance type from current URL
         const routeType = getRouteType(location.pathname);
         if (!routeType) {
           toast.error('Invalid access path', {
@@ -136,11 +120,11 @@ function App() {
         const userWithType = { ...user, attendanceType: routeType };
         setLoggedInUser(userWithType);
         localStorage.setItem('GCCC_ATTENDANCE', JSON.stringify(userWithType));
-        
+
         toast.success('Login successful', {
           position: 'top-right',
         });
-        
+
         navigate(ROUTES[routeType].home);
       } else {
         toast.error('Invalid Email/Phone Number', {
@@ -212,8 +196,14 @@ function App() {
             />
           }
         >
-          <Route path="home" element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />} />
-          <Route path="attendance" element={<Attendance attendanceType="physical" />} />
+          <Route
+            path="home"
+            element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />}
+          />
+          <Route
+            path="attendance"
+            element={<Attendance attendanceType="physical" />}
+          />
         </Route>
 
         {/* Online Member Routes */}
@@ -244,8 +234,14 @@ function App() {
             />
           }
         >
-          <Route path="home" element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />} />
-          <Route path="attendance" element={<Attendance attendanceType="online" />} />
+          <Route
+            path="home"
+            element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />}
+          />
+          <Route
+            path="attendance"
+            element={<Attendance attendanceType="online" />}
+          />
         </Route>
 
         {/* Default Route */}
