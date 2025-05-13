@@ -3,22 +3,19 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import Login from '../src/Pages/AuthPage/Login';
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import {
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 import Attendance from './Pages/Attendance/Attendance';
 import Dashboard from './Pages/ChurchDashboard/Dashboard';
-import Events from './Pages/Events/Events';
-import LandingPage from './Pages/LandingPage/HomePage/Home';
 import Home from './Pages/Home/Home';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import About from './Pages/LandingPage/AboutPage/Aboutpage';
-import Forms from './Pages/LandingPage/Formspage/Formspage';
-import HomeDetails from './Pages/LandingPage/HomeDetails/HomeDetails';
-import Stream from './Pages/LandingPage/StreamPage.jsx/Stream';
-import Give from './Pages/LandingPage/GivePage/Give';
-import Navbar from './Modals/Navbar';
-import HomeNavbar from './Modals/HomeNavbar';
-import Resources from './Pages/Resources/Resources';
+
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -27,15 +24,48 @@ function App() {
   const getDataUrl = import.meta.env.VITE_APP_GET_DATA;
   const [isMarked, setIsMarked] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const routes = {
+    physical: {
+      base: '/physical',
+      login: '/physical/login',
+      home: '/physical/home',
+      attendance: '/physical/attendance',
+    },
+    online: {
+      base: '/online',
+      login: '/online/login',
+      home: '/online/home',
+      attendance: '/online/attendance',
+    },
+  };
+
+  const getRouteType = (path) => {
+    if (path.startsWith(routes.physical.base)) return 'physical';
+    if (path.startsWith(routes.online.base)) return 'online';
+    return null;
+  };
 
   useEffect(() => {
     AOS.init();
     const storedUser = localStorage.getItem('GCCC_ATTENDANCE');
     if (storedUser) {
-      setLoggedInUser(JSON.parse(storedUser));
-      navigate('/');
+      const userData = JSON.parse(storedUser);
+      setLoggedInUser(userData);
+
+      const currentPath = location.pathname;
+      const routeType = getRouteType(currentPath);
+
+      if (routeType) {
+        if (currentPath === routes[routeType].login) {
+          navigate(routes[routeType].home);
+        }
+      } else {
+        navigate(routes[userData.attendanceType].home);
+      }
     }
-  }, []);
+  }, [location.pathname]);
 
   const handleLogin = async (username, password) => {
     try {
@@ -44,39 +74,75 @@ function App() {
       const lowercaseUsername = username.toLowerCase();
       const user = users.find(
         (user) =>
-          user.Email.toLowerCase() == lowercaseUsername ||
-          user['Phone Number'] == username
+          user.Email.toLowerCase() === lowercaseUsername ||
+          user['Phone Number'] === username
       );
 
       if (user) {
-        setLoggedInUser(user);
-        localStorage.setItem('GCCC_ATTENDANCE', JSON.stringify(user));
-        toast.success('Login successfull', {
+        const routeType = getRouteType(location.pathname);
+        if (!routeType) {
+          toast.error('Invalid access path', {
+            position: 'top-right',
+          });
+          return;
+        }
+
+        const userWithType = { ...user, attendanceType: routeType };
+        setLoggedInUser(userWithType);
+        localStorage.setItem('GCCC_ATTENDANCE', JSON.stringify(userWithType));
+
+        toast.success('Login successful', {
           position: 'top-right',
         });
-        navigate('/');
+
+        navigate(routes[routeType].home);
       } else {
-        toast.error('Invalid Email/Phone Number ', {
+        toast.error('Invalid Email/Phone Number', {
           position: 'top-right',
         });
       }
     } catch (error) {
-      toast.error(error, {
+      toast.error('Login failed. Please try again.', {
         position: 'top-right',
       });
     }
   };
 
-  const ProtectedRoute = ({ element, ...rest }) => {
-    return loggedInUser ? element : <Navigate to="/login" />;
+  const handleLogout = (attendanceType) => {
+    localStorage.removeItem('GCCC_ATTENDANCE');
+    setLoggedInUser(null);
+    navigate(routes[attendanceType].login);
+    toast.success('Logged out successfully', {
+      position: 'top-right',
+    });
   };
+
+  const ProtectedRoute = ({ element, attendanceType }) => {
+    if (!loggedInUser) {
+      return <Navigate to={routes[attendanceType].login} replace />;
+    }
+    if (loggedInUser.attendanceType !== attendanceType) {
+      return <Navigate to={routes[loggedInUser.attendanceType].home} replace />;
+    }
+    return element;
+  };
+
   return (
     <>
       <Routes>
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-
+        {/* Physical Member Routes */}
         <Route
-          path="/"
+          path={routes.physical.login}
+          element={
+            loggedInUser ? (
+              <Navigate to={routes.physical.home} replace />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path={`${routes.physical.base}/*`}
           element={
             <ProtectedRoute
               element={
@@ -84,34 +150,75 @@ function App() {
                   user={loggedInUser}
                   isMarked={isMarked}
                   setIsMarked={setIsMarked}
+                  attendanceType="physical"
+                  onLogout={() => handleLogout('physical')}
                 />
               }
+              attendanceType="physical"
             />
           }
         >
           <Route
-            path="/"
+            path="home"
             element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />}
           />
-          <Route path="/attendance" element={<Attendance />} />
+          <Route
+            path="attendance"
+            element={<Attendance attendanceType="physical" />}
+          />
         </Route>
 
+        {/* Online Member Routes */}
+        <Route
+          path={routes.online.login}
+          element={
+            loggedInUser ? (
+              <Navigate to={routes.online.home} replace />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
+          }
+        />
+        <Route
+          path={`${routes.online.base}/*`}
+          element={
+            <ProtectedRoute
+              element={
+                <Dashboard
+                  user={loggedInUser}
+                  isMarked={isMarked}
+                  setIsMarked={setIsMarked}
+                  attendanceType="online"
+                  onLogout={() => handleLogout('online')}
+                />
+              }
+              attendanceType="online"
+            />
+          }
+        >
+          <Route
+            path="home"
+            element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />}
+          />
+          <Route
+            path="attendance"
+            element={<Attendance attendanceType="online" />}
+          />
+        </Route>
+
+        {/* Default Route */}
         <Route
           path="*"
           element={
-            <>
-              <div className="flex flex-col gap-6 items-center justify-center w-full h-[100vh]">
-                <h1 className="text-2xl font-bold">
-                  Error 404: Page Not Found.
-                </h1>{' '}
-                <button
-                  className="px-6 py-4 text-lg text-white bg-purple-600 border rounded-lg"
-                  onClick={() => navigate('/')}
-                >
-                  Back to Home
-                </button>{' '}
-              </div>
-            </>
+            <div className="flex flex-col gap-6 items-center justify-center w-full h-[100vh]">
+              <h1 className="text-2xl font-bold">Error 404: Page Not Found</h1>
+              <button
+                className="px-6 py-4 text-lg text-white bg-purple-600 border rounded-lg"
+                onClick={() => navigate(routes.physical.home)}
+              >
+                Back to Home
+              </button>
+            </div>
           }
         />
       </Routes>
@@ -121,7 +228,18 @@ function App() {
 }
 
 export default App;
-/*   (user) =>
+/*  
+import About from './Pages/LandingPage/AboutPage/Aboutpage';
+import Forms from './Pages/LandingPage/Formspage/Formspage';
+import HomeDetails from './Pages/LandingPage/HomeDetails/HomeDetails';
+import Stream from './Pages/LandingPage/StreamPage.jsx/Stream';
+import Give from './Pages/LandingPage/GivePage/Give';
+import Navbar from './Modals/Navbar';
+import HomeNavbar from './Modals/HomeNavbar';
+import Resources from './Pages/Resources/Resources';
+import Events from './Pages/Events/Events';
+import LandingPage from './Pages/LandingPage/HomePage/Home';
+(user) =>
           (user.Email.toLowerCase() == lowercaseUsername &&
             user["Phone Number"] == password) ||
           (user["Phone Number"] == username && user["Phone Number"] == password)

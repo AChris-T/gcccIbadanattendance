@@ -15,16 +15,19 @@ import { IoMdLogOut } from 'react-icons/io';
 import AttendanceIcon from '../../assets/AttendanceIcon';
 import { PiNoteFill } from 'react-icons/pi';
 
-const Dashboard = ({ isMarked, setIsMarked }) => {
+const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
   const [titleApp, setTitleApp] = useState('Home');
   const location = useLocation();
   const [value, setValue] = React.useState(0);
   const navigate = useNavigate();
 
+  // Get the base path based on attendance type
+  const basePath = `/${attendanceType}`;
+
   const handleClearLocalStorage = () => {
     localStorage.removeItem('GCCC_ATTENDANCE');
     window.location.reload();
-    navigate('/login');
+    navigate(`${basePath}/login`);
     toast.success('Have a nice day', {
       position: 'top-right',
     });
@@ -50,44 +53,35 @@ const Dashboard = ({ isMarked, setIsMarked }) => {
             } w-full flex justify-between lg:px-[142px] px-4 pt-3 pb-4 bottom-0 fixed  `}
           >
             <NavLink
-              to="/"
-              className="flex flex-col items-center   rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium  "
-              style={({ isActive }) => {
-                return {
-                  fontWeight: isActive ? '500' : '500',
-                  color: isActive ? '#fff' : '#ffffffa8',
-                };
-              }}
+              to={`${basePath}/home`}
+              className={({ isActive }) =>
+                `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
+                  isActive ? 'text-white' : 'text-[#ffffffa8]'
+                }`
+              }
             >
               <FaUserCheck className="text-[24px]" />
               Home
             </NavLink>
             <NavLink
-              to="attendance"
-              //onClick={!setIsMarked}
-              className="flex flex-col items-center  rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium  "
-              style={({ isActive }) => {
-                return {
-                  fontWeight: isActive ? '500' : '500',
-                  color: isActive ? '#fff' : '#ffffffa8',
-                };
-              }}
+              to={`${basePath}/attendance`}
+              className={({ isActive }) =>
+                `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
+                  isActive ? 'text-white' : 'text-[#ffffffa8]'
+                }`
+              }
             >
               <PiNoteFill className="text-[24px]" />
-              {/*           <img src={check} alt="gccclogo" width={"px2rem(24)"} height={"px2rem(24)"} />
-               */}{' '}
-              Attendance{' '}
+              Attendance
             </NavLink>
             <NavLink
-              to="/login"
+              to={`${basePath}/login`}
               onClick={handleClearLocalStorage}
-              className="flex flex-col items-center   rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium  "
-              style={({ isActive }) => {
-                return {
-                  fontWeight: isActive ? '500' : '500',
-                  color: isActive ? '#fff' : '#ffffffa8',
-                };
-              }}
+              className={({ isActive }) =>
+                `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
+                  isActive ? 'text-white' : 'text-[#ffffffa8]'
+                }`
+              }
             >
               <IoMdLogOut className="text-[24px]" />
               Logout
