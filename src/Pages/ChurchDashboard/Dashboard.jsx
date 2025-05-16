@@ -20,14 +20,19 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
   const location = useLocation();
   const [value, setValue] = React.useState(0);
   const navigate = useNavigate();
+  const params = new URLSearchParams(location.search);
+  const source = params.get('source');
 
-  // Get the base path based on attendance type
-  const basePath = `/${attendanceType}`;
-
+  useEffect(() => {
+    if (source === 'online') {
+      console.log('User is attending online');
+    }
+  }, [source]);
+  const query = source === 'online' ? '?source=online' : '';
   const handleClearLocalStorage = () => {
     localStorage.removeItem('GCCC_ATTENDANCE');
     window.location.reload();
-    navigate(`${basePath}/login`);
+    navigate('/login');
     toast.success('Have a nice day', {
       position: 'top-right',
     });
@@ -53,7 +58,7 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
             } w-full flex justify-between lg:px-[142px] px-4 pt-3 pb-4 bottom-0 fixed  `}
           >
             <NavLink
-              to={`${basePath}/home`}
+              to={`/${query}`}
               className={({ isActive }) =>
                 `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
                   isActive ? 'text-white' : 'text-[#ffffffa8]'
@@ -64,7 +69,7 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
               Home
             </NavLink>
             <NavLink
-              to={`${basePath}/attendance`}
+              to={`/attendance${query}`}
               className={({ isActive }) =>
                 `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
                   isActive ? 'text-white' : 'text-[#ffffffa8]'
@@ -75,7 +80,7 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
               Attendance
             </NavLink>
             <NavLink
-              to={`${basePath}/login`}
+              to={`/login${query}`}
               onClick={handleClearLocalStorage}
               className={({ isActive }) =>
                 `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 export default function Attendance() {
   const postDataUrl = import.meta.env.VITE_APP_POST_DATA;
   const authUser = JSON.parse(localStorage.getItem('GCCC_ATTENDANCE'));
-  
+
   const [state, setState] = useState({
     users: [],
     filteredUsers: [],
@@ -12,6 +12,37 @@ export default function Attendance() {
     selectedMonth: new Date().toLocaleString('default', { month: 'long' }),
     isLoading: true,
   });
+
+  const getAllDatesForMonth = (month) => {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth, today.getDate() - 1);
+
+    const dates = [];
+    const currentDate = new Date(firstDay);
+
+    while (currentDate <= lastDay) {
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        currentDate.getDate()
+      );
+      dates.push(date);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+  };
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const totalPages = Math.ceil(state.filteredUsers.length / state.itemsPerPage);
   const startIndex = (state.currentPage - 1) * state.itemsPerPage;
@@ -43,15 +74,53 @@ export default function Attendance() {
         );
       }
 
+      const allDates = getAllDatesForMonth(state.selectedMonth);
+
+      const attendanceMap = new Map(
+        matchedUsers.map((user) => {
+          const date = new Date(user.Key);
+          return [formatDate(date), user];
+        })
+      );
+
+      const today = new Date();
+      const todayStr = formatDate(today);
+      const todayAttendance = matchedUsers.find(
+        (user) => formatDate(new Date(user.Key)) === todayStr
+      );
+      if (todayAttendance) {
+        attendanceMap.set(todayStr, todayAttendance);
+      }
+
+      const combinedAttendance = allDates
+        .map((date) => {
+          const dateStr = formatDate(date);
+          const dayOfWeek = date.toLocaleDateString('en-US', {
+            weekday: 'long',
+          });
+
+          if (attendanceMap.has(dateStr)) {
+            return attendanceMap.get(dateStr);
+          } else if (allowedDays.includes(dayOfWeek)) {
+            return {
+              Key: dateStr,
+              Service: dayOfWeek,
+              Time: '',
+              status: 'Absent',
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+
+      if (todayAttendance) {
+        combinedAttendance.push(todayAttendance);
+      }
+
       setState((prev) => ({
         ...prev,
-        users: matchedUsers,
-        filteredUsers: matchedUsers.filter((user) => {
-          const userMonth = new Date(user.Key).toLocaleString('default', {
-            month: 'long',
-          });
-          return userMonth === prev.selectedMonth;
-        }),
+        users: combinedAttendance,
+        filteredUsers: combinedAttendance,
         isLoading: false,
       }));
     } catch (error) {
@@ -130,11 +199,15 @@ export default function Attendance() {
 
           {state.isLoading ? (
             <div className="flex items-center justify-center w-full h-64">
-              <div className="text-white text-xl">Loading attendance data...</div>
+              <div className="text-xl text-white">
+                Loading attendance data...
+              </div>
             </div>
           ) : currentUsers.length === 0 ? (
             <div className="flex items-center justify-center w-full h-64">
-              <div className="text-white text-xl">No attendance records found</div>
+              <div className="text-xl text-white">
+                No attendance records found
+              </div>
             </div>
           ) : (
             <>
@@ -145,18 +218,24 @@ export default function Attendance() {
                       <tr>
                         <th className="px-4 pl-[30px] py-2">Date</th>
                         <th className="px-4 py-2">Service</th>
+                        <th className="px-4 py-2">Staus</th>
                         <th className="px-4 py-2">Service Time</th>
                         <th className="px-4 py-2">Checked in Time</th>
                       </tr>
                     </thead>
                     <tbody>
                       {currentUsers.map((user) => (
-                        <tr key={user.id} className="text-white">
+                        <tr key={user.Key} className="text-white">
                           <td className="px-4 text-sm py-7 pl-[30px]">
                             {user.Key}
                           </td>
                           <td className="px-4 text-sm py-7">
                             {user.Service} Service
+                          </td>
+                          <td className="px-4 text-sm py-7">
+                            <span className={`${user.status === 'Absent' ? 'text-red-500' : 'text-green-500'} font-medium`}>
+                              {user.status || 'Present'}
+                            </span>
                           </td>
                           <td className="px-4 text-sm py-7">
                             {user.Service === 'Friday'
@@ -168,7 +247,7 @@ export default function Attendance() {
                               : ''}
                           </td>
                           <td className="px-4 w-[250px] text-sm py-7">
-                            {formatTime(user.Time)}
+                            {user.Time ? formatTime(user.Time) : '-'}
                           </td>
                         </tr>
                       ))}
