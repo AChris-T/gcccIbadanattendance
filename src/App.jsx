@@ -69,12 +69,9 @@ function App() {
         toast.success('Login successful', {
           position: 'top-right',
         });
-
-        // 👇 Read the source param from URL
         const params = new URLSearchParams(location.search);
         const source = params.get('source');
 
-        // 👇 Redirect conditionally based on source
         if (source === 'online') {
           navigate('/attendance?source=online');
         } else {

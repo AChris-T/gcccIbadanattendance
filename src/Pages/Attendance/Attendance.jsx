@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 
 export default function Attendance() {
@@ -213,7 +214,7 @@ export default function Attendance() {
             <>
               <div className="w-full h-full mt-8 overflow-x-auto">
                 <div className="rounded-lg">
-                  <table className="w-full min-w-[1000px] max-w-[1240px] text-sm text-left rounded-lg border-[1px] border-[#444466]">
+                  <table className="w-full min-w-[1000px] max-w-full text-sm text-left rounded-lg border-[1px] border-[#444466]">
                     <thead className="text-white h-[48px] bg-[#1E1E2F]">
                       <tr>
                         <th className="px-4 pl-[30px] py-2">Date</th>
@@ -233,7 +234,13 @@ export default function Attendance() {
                             {user.Service} Service
                           </td>
                           <td className="px-4 text-sm py-7">
-                            <span className={`${user.status === 'Absent' ? 'text-red-500' : 'text-green-500'} font-medium`}>
+                            <span
+                              className={`${
+                                user.status === 'Absent'
+                                  ? 'text-red-500'
+                                  : 'text-green-500'
+                              } font-medium`}
+                            >
                               {user.status || 'Present'}
                             </span>
                           </td>
