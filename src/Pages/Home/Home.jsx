@@ -9,6 +9,7 @@ import animationData from '../../assets/Animation.json';
 import { motion } from 'framer-motion';
 import HandIcon from '../../assets/HandIcon';
 import CheckedIcon from '../../assets/CheckedIcon';
+import { useParams } from 'react-router-dom';
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isoWeek);
@@ -27,7 +28,9 @@ const Home = ({ isMarked, setIsMarked }) => {
     open: false,
     isReading: false,
   });
-
+  const params = new URLSearchParams(location.search);
+  const source = params.get('source') || 'physical';
+  console.log(source);
   const current = {
     time: dayjs().format('HH:mm A'),
     day: dayjs().format('dddd'),
@@ -40,7 +43,7 @@ const Home = ({ isMarked, setIsMarked }) => {
   const uniqueKey = `${current.day}-${current.date}-${current.month}-${current.year}`;
 
   const handleButtonClick = async () => {
-    if (state.loading || state.marked) return; 
+    if (state.loading || state.marked) return;
     setState((prev) => ({ ...prev, loading: true, isReading: true }));
     const timeNow = dayjs().format('hh:mm A');
     localStorage.setItem('GCCC_CLOCK_IN_TIME', timeNow);
@@ -59,6 +62,7 @@ const Home = ({ isMarked, setIsMarked }) => {
       formData.append('Date', new Date());
       formData.append('Time', current.time);
       formData.append('Key', uniqueKey);
+      formData.append('Attendee', source);
 
       const res = await fetch(postDataUrl, { method: 'POST', body: formData });
       await res.json();

@@ -1,8 +1,5 @@
 /* eslint-disable no-unused-vars */
-
 /* eslint-disable react/prop-types */
-//import React from 'react'
-//import Sidebar from "./Sidebar";
 import gccclogo from '../assets/Images/log.png';
 import dayjs from 'dayjs';
 import logo from '../assets/Images/gcc.png';
