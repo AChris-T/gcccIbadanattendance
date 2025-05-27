@@ -9,7 +9,7 @@ import animationData from '../../assets/Animation.json';
 import { motion } from 'framer-motion';
 import HandIcon from '../../assets/HandIcon';
 import CheckedIcon from '../../assets/CheckedIcon';
-import { useParams } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners';
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isoWeek);
@@ -154,25 +154,31 @@ const Home = ({ isMarked, setIsMarked }) => {
             <div className="flex flex-col items-center gap-1">
               {!state.marked ? (
                 allowedDays.includes(current.day) ? (
-                  <div className="p-3 bg-[#2E2E44] rounded-full bg- ">
-                    <div className="bg-[#3A4D70] rounded-full  animate-pulse delay-150">
-                      <motion.div
-                        onClick={handleButtonClick}
-                        className="rounded-full bg-[#4C8EFF] p-9 cursor-pointer relative"
-                        initial={{ scale: 0.8 }}
-                        animate={{ scale: [1, 1.1, 1] }}
-                        transition={{
-                          repeat: Infinity,
-                          repeatType: 'loop',
-                          duration: 1.5,
-                          type: 'spring',
-                        }}
-                      >
-                        <span className="absolute inset-1 rounded-full  border-4 border-[#202a46] opacity-90 animate-ping delay-1000"></span>
-                        <span className="absolute inset-1 rounded-full border-4 border-[#172346] opacity-90 animate-ping delay-10000"></span>{' '}
-                        <HandIcon />
-                      </motion.div>
-                    </div>
+                  <div className="p-3 rounded-full ">
+                    {state.isReading ? (
+                      <div className="my-20">
+                        <ClipLoader color="#4C8EFF" />
+                      </div>
+                    ) : (
+                      <div className="bg-[#3A4D70] rounded-full  animate-pulse delay-150">
+                        <motion.div
+                          onClick={handleButtonClick}
+                          className="rounded-full bg-[#4C8EFF] p-9 cursor-pointer relative"
+                          initial={{ scale: 0.8 }}
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{
+                            repeat: Infinity,
+                            repeatType: 'loop',
+                            duration: 1.5,
+                            type: 'spring',
+                          }}
+                        >
+                          <span className="absolute inset-1 rounded-full  border-4 border-[#202a46] opacity-90 animate-ping delay-1000"></span>
+                          <span className="absolute inset-1 rounded-full border-4 border-[#172346] opacity-90 animate-ping delay-10000"></span>{' '}
+                          <HandIcon />
+                        </motion.div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <p className="my-20 text-center text-white">

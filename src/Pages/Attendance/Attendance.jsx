@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
+import { BounceLoader } from 'react-spinners';
 
 export default function Attendance() {
   const postDataUrl = import.meta.env.VITE_APP_POST_DATA;
@@ -45,6 +46,11 @@ export default function Attendance() {
     return `${year}-${month}-${day}`;
   };
 
+  const formatDisplayDate = (dateString) => {
+    const date = new Date(dateString);
+    return formatDate(date);
+  };
+
   const totalPages = Math.ceil(state.filteredUsers.length / state.itemsPerPage);
   const startIndex = (state.currentPage - 1) * state.itemsPerPage;
   const endIndex = startIndex + state.itemsPerPage;
@@ -79,7 +85,7 @@ export default function Attendance() {
 
       const attendanceMap = new Map(
         matchedUsers.map((user) => {
-          const date = new Date(user.Key);
+          const date = new Date(user.Date);
           return [formatDate(date), user];
         })
       );
@@ -87,7 +93,7 @@ export default function Attendance() {
       const today = new Date();
       const todayStr = formatDate(today);
       const todayAttendance = matchedUsers.find(
-        (user) => formatDate(new Date(user.Key)) === todayStr
+        (user) => formatDate(new Date(user.Date)) === todayStr
       );
       if (todayAttendance) {
         attendanceMap.set(todayStr, todayAttendance);
@@ -104,7 +110,7 @@ export default function Attendance() {
             return attendanceMap.get(dateStr);
           } else if (allowedDays.includes(dayOfWeek)) {
             return {
-              Key: dateStr,
+              Date: dateStr,
               Service: dayOfWeek,
               Time: '',
               status: 'Absent',
@@ -112,10 +118,11 @@ export default function Attendance() {
           }
           return null;
         })
-        .filter(Boolean);
+        .filter(Boolean)
+        .sort((a, b) => new Date(b.Date) - new Date(a.Date));
 
       if (todayAttendance) {
-        combinedAttendance.push(todayAttendance);
+        combinedAttendance.unshift(todayAttendance);
       }
 
       setState((prev) => ({
@@ -136,7 +143,7 @@ export default function Attendance() {
 
   useEffect(() => {
     const filtered = state.users.filter((user) => {
-      const userMonth = new Date(user.Key).toLocaleString('default', {
+      const userMonth = new Date(user.Date).toLocaleString('default', {
         month: 'long',
       });
       return userMonth === state.selectedMonth;
@@ -149,15 +156,123 @@ export default function Attendance() {
   }, [state.selectedMonth]);
 
   function formatTime(timeString) {
-    const [hours, minutes] = timeString.split(':');
-    const date = new Date();
-    date.setHours(parseInt(hours));
-    date.setMinutes(parseInt(minutes));
+    if (!timeString) return '-';
 
-    const options = { hour: 'numeric', minute: '2-digit', hour12: true };
-    const formatted = date.toLocaleTimeString([], options);
-    return formatted.toLowerCase().replace(':', '.');
+    try {
+      let hours, minutes;
+
+      if (timeString.includes('T')) {
+        const date = new Date(timeString);
+        if (isNaN(date.getTime())) return '-';
+        hours = date.getHours();
+        minutes = date.getMinutes();
+      } else {
+        const timeParts = timeString.split(':');
+        if (timeParts.length !== 2) return '-';
+
+        hours = parseInt(timeParts[0], 10);
+        minutes = parseInt(timeParts[1], 10);
+
+        if (isNaN(hours) || isNaN(minutes)) return '-';
+      }
+
+      // Validate hours and minutes
+      if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return '-';
+
+      const period = hours >= 12 ? 'pm' : 'am';
+      hours = hours % 12 || 12;
+
+      return `${String(hours).padStart(2, '0')}.${String(minutes).padStart(
+        2,
+        '0'
+      )}${period}`;
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return '-';
+    }
   }
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setState((prev) => ({ ...prev, currentPage: newPage }));
+    }
+  };
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(
+      1,
+      state.currentPage - Math.floor(maxVisiblePages / 2)
+    );
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    buttons.push(
+      <button
+        key="first"
+        onClick={() => handlePageChange(1)}
+        disabled={state.currentPage === 1}
+        className="w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white bg-[#23233a] hover:bg-[#2E2E44] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        &#171;
+      </button>
+    );
+
+    buttons.push(
+      <button
+        key="prev"
+        onClick={() => handlePageChange(state.currentPage - 1)}
+        disabled={state.currentPage === 1}
+        className="w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white bg-[#23233a] hover:bg-[#2E2E44] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        &#60;
+      </button>
+    );
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white transition-colors ${
+            state.currentPage === i
+              ? 'bg-[#FF7242] hover:bg-[#FF8B5F]'
+              : 'bg-[#23233a] hover:bg-[#2E2E44]'
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    buttons.push(
+      <button
+        key="next"
+        onClick={() => handlePageChange(state.currentPage + 1)}
+        disabled={state.currentPage === totalPages}
+        className="w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white bg-[#23233a] hover:bg-[#2E2E44] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        &#62;
+      </button>
+    );
+
+    buttons.push(
+      <button
+        key="last"
+        onClick={() => handlePageChange(totalPages)}
+        disabled={state.currentPage === totalPages}
+        className="w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white bg-[#23233a] hover:bg-[#2E2E44] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        &#187;
+      </button>
+    );
+
+    return buttons;
+  };
 
   return (
     <div className="px-4 mt-16 mb-20 md:mt-40">
@@ -168,7 +283,7 @@ export default function Attendance() {
             <div className="flex flex-wrap items-center justify-center w-full gap-3 md:justify-start">
               <div className="h-14 py-3  rounded-lg px-2 font-medium text-sm border-[#444466] border bg-[#1E1E2F]">
                 <select
-                  className="bg-[#1E1E2F] pr-5 text-white w-full h-full focus:outline-none"
+                  className="bg-[#1E1E2F] w-full pr-5 text-white  h-full focus:outline-none"
                   value={state.selectedMonth}
                   onChange={(e) =>
                     setState((prev) => ({
@@ -201,7 +316,7 @@ export default function Attendance() {
           {state.isLoading ? (
             <div className="flex items-center justify-center w-full h-64">
               <div className="text-xl text-white">
-                Loading attendance data...
+                <BounceLoader color={'#4C8EFF'} />
               </div>
             </div>
           ) : currentUsers.length === 0 ? (
@@ -226,9 +341,9 @@ export default function Attendance() {
                     </thead>
                     <tbody>
                       {currentUsers.map((user) => (
-                        <tr key={user.Key} className="text-white">
+                        <tr key={user.Date} className="text-white">
                           <td className="px-4 text-sm py-7 pl-[30px]">
-                            {user.Key}
+                            {formatDisplayDate(user.Date)}
                           </td>
                           <td className="px-4 text-sm py-7">
                             {user.Service} Service
@@ -241,7 +356,14 @@ export default function Attendance() {
                                   : 'text-green-500'
                               } font-medium`}
                             >
-                              {user.status || 'Present'}
+                              {user.status || (
+                                <div className="">
+                                  Present{' '}
+                                  <sub className="text-[12px]">
+                                    ({user.Attendee})
+                                  </sub>
+                                </div>
+                              )}
                             </span>
                           </td>
                           <td className="px-4 text-sm py-7">
@@ -264,11 +386,11 @@ export default function Attendance() {
               </div>
 
               {/* Pagination */}
-              <div className="flex flex-col items-center justify-between w-full gap-2 mt-4 md:flex-row">
+              <div className="flex flex-col items-center justify-between w-full gap-2 mt-4 z-60 md:flex-row">
                 <div className="flex items-center gap-2 mb-2 md:mb-0">
                   <span className="text-sm text-white">Show</span>
                   <select
-                    className="bg-[#23233a] text-white border border-[#444466] rounded px-2 py-1"
+                    className="bg-[#23233a] text-white border border-[#444466] rounded px-2 py-1 cursor-pointer hover:bg-[#2E2E44] transition-colors"
                     value={state.itemsPerPage}
                     onChange={(e) =>
                       setState((prev) => ({
@@ -278,62 +400,18 @@ export default function Attendance() {
                       }))
                     }
                   >
-                    {[4, 10, 20, 50].map((size) => (
+                    {[4, 10].map((size) => (
                       <option key={size} value={size}>
                         {size}
                       </option>
                     ))}
                   </select>
-                  <span className="text-sm text-white">
+                  <span className="flex text-sm text-white">
                     from {state.filteredUsers.length}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() =>
-                      setState((prev) => ({ ...prev, currentPage: 1 }))
-                    }
-                    disabled={state.currentPage === 1}
-                    className="w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white bg-[#23233a] disabled:opacity-50"
-                  >
-                    &#171;
-                  </button>
-                  <button
-                    onClick={() =>
-                      setState((prev) => ({
-                        ...prev,
-                        currentPage: Math.max(prev.currentPage - 1, 1),
-                      }))
-                    }
-                    disabled={state.currentPage === 1}
-                    className="w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white bg-[#23233a] disabled:opacity-50"
-                  >
-                    &#60;
-                  </button>
-                  <button
-                    onClick={() =>
-                      setState((prev) => ({
-                        ...prev,
-                        currentPage: Math.min(prev.currentPage + 1, totalPages),
-                      }))
-                    }
-                    disabled={state.currentPage === totalPages}
-                    className="w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white bg-[#23233a] disabled:opacity-50"
-                  >
-                    &#62;
-                  </button>
-                  <button
-                    onClick={() =>
-                      setState((prev) => ({
-                        ...prev,
-                        currentPage: totalPages,
-                      }))
-                    }
-                    disabled={state.currentPage === totalPages}
-                    className="w-8 h-8 flex items-center justify-center rounded border border-[#444466] text-white bg-[#23233a] disabled:opacity-50"
-                  >
-                    &#187;
-                  </button>
+                  {renderPaginationButtons()}
                 </div>
               </div>
             </>
