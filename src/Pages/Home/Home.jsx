@@ -204,7 +204,7 @@ const Home = ({ isMarked, setIsMarked }) => {
                         Watch on YouTube
                       </a>
                       <a
-                        href="https://t.me/@gcccibadanmessages"
+                        href="https://t.me/gcccibadanmessages"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-6 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600"
