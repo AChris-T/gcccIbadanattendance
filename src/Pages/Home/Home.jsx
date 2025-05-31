@@ -196,7 +196,7 @@ const Home = ({ isMarked, setIsMarked }) => {
 
                     <div className="flex flex-col gap-4 sm:flex-row">
                       <a
-                        href="https://www.youtube.com/@Gccc_Ibadan/videos"
+                        href="https://youtube.com/@gccc_ibadan?si=XRe2Ev_qj9vK8nJz"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center px-6 py-2 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
@@ -204,7 +204,7 @@ const Home = ({ isMarked, setIsMarked }) => {
                         Watch on YouTube
                       </a>
                       <a
-                        href="https://t.me/gcccibadanmessages"
+                        href="https://t.me/Pastoropeyemipeter"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-6 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600"
