@@ -199,7 +199,7 @@ const Home = ({ isMarked, setIsMarked }) => {
                         href="https://www.youtube.com/@Gccc_Ibadan/videos"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-6 py-2 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
+                        className="flex items-center justify-center px-6 py-2 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
                       >
                         Watch on YouTube
                       </a>
