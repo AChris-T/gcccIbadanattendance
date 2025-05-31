@@ -186,12 +186,13 @@ const Home = ({ isMarked, setIsMarked }) => {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full md:h-[50dvh] gap-5 mt-20 ">
-                    <p className="text-center text-white ">
-                      No attendance available for this day.
+                    <p className="capitalize text-[14px] text-white">
+                      Hello 👋, {authUser['First Name']}
                     </p>
                     <p className="max-w-md text-center text-white">
-                      You can catch up with previous services on YouTube and
-                      download audio messages on Telegram.
+                      We do not have a church service today, but you
+                      can catch-up catch up with previous services on YouTube
+                      and download audio messages on Telegram.
                     </p>
 
                     <div className="flex flex-col gap-4 sm:flex-row">
