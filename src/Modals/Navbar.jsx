@@ -8,7 +8,7 @@ const Navbar = ({ isMarked }) => {
   const formattedDateTime = dayjs().format('dddd  [,] MMMM DD YYYY');
   const formattedTime = dayjs().format('hh:mm A ');
   return (
-    <div className="flex w-full bg-[#24244e] items-center z-50 relative  justify-between md:h-[108px] h-[59px] md:items-center p-4">
+    <div className="flex w-full  items-center z-50 relative  justify-between md:h-[108px] h-[59px] md:items-center p-4">
       <img
         src={gccclogo}
         alt="menu"

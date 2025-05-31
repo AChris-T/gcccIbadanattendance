@@ -135,12 +135,16 @@ const Home = ({ isMarked, setIsMarked }) => {
     <div className="w-full px-2 mt-[70px]">
       <div className="flex gap-3 flex-col items-center mb-[70px]">
         <div className="flex flex-col items-center gap-5 mx-4">
-          <h1 className="capitalize text-[14px] text-white">
-            Hello 👋, {authUser['First Name']}
-          </h1>
-          <p className="text-[32px] text-center text-white font-semibold">
-            Welcome To {current.day} Service!
-          </p>
+          {allowedDays.includes(current.day) ? (
+            <>
+              <p className="capitalize text-[14px] text-white">
+                Hello 👋, {authUser['First Name']}
+              </p>
+              <p className="text-[32px] text-center text-white font-semibold">
+                Welcome To {current.day} Service!
+              </p>
+            </>
+          ) : null}
         </div>
 
         {state.loadingUserAttendance ? (
@@ -181,24 +185,53 @@ const Home = ({ isMarked, setIsMarked }) => {
                     )}
                   </div>
                 ) : (
-                  <p className="my-20 text-center text-white">
-                    No attendance available for this day.
-                  </p>
+                  <div className="flex flex-col items-center justify-center h-full md:h-[50dvh] gap-5 mt-20 ">
+                    <p className="text-center text-white ">
+                      No attendance available for this day.
+                    </p>
+                    <p className="max-w-md text-center text-white">
+                      You can catch up with previous services on YouTube and
+                      download audio messages on Telegram.
+                    </p>
+
+                    <div className="flex flex-col gap-4 sm:flex-row">
+                      <a
+                        href="https://www.youtube.com/@Gccc_Ibadan/videos"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-6 py-2 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
+                      >
+                        Watch on YouTube
+                      </a>
+                      <a
+                        href="https://t.me/@gcccibadanmessages"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-6 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                      >
+                        Download on Telegram
+                      </a>
+                    </div>
+                  </div>
                 )
               ) : (
                 <CheckedIcon />
               )}
 
               {state.isReading && <p className="mt-2 text-white">Reading...</p>}
-              <h3 className="mt-5 text-white">
-                {isMarked
-                  ? 'Attendance Taken'
-                  : 'Tap the button to log your attendance'}
-              </h3>
-              <p className="my-3 text-sm font-semibold text-white">
-                Clock In Time
-              </p>
-              <p className="text-white">{state.clockInTime}</p>
+              {allowedDays.includes(current.day) ? (
+                <>
+                  <h3 className="mt-5 text-white">
+                    {isMarked
+                      ? 'Attendance Taken'
+                      : 'Tap the button to log your attendance'}
+                  </h3>
+                  <p className="my-3 text-sm font-semibold text-white">
+                    Clock In Time
+                  </p>
+                  <p className="text-white">{state.clockInTime}</p>
+                </>
+              ) : null}
             </div>
           </div>
         )}
