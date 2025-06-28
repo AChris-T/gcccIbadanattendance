@@ -18,7 +18,6 @@ import { PiNoteFill } from 'react-icons/pi';
 const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
   const [titleApp, setTitleApp] = useState('Home');
   const location = useLocation();
-  const [value, setValue] = React.useState(0);
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const source = params.get('source');
@@ -45,7 +44,7 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
       } mx-auto shadow-card h-full`}
     >
       <div className="flex flex-col ">
-        <div className="flex flex-col h-[100dvh] justify-between w-full">
+        <div className="flex flex-col min-h-[100dvh]  justify-between w-full">
           <div>
             <Navbar title={titleApp} isMarked={isMarked} />
             <div className="md:h-[90dvh] overflow-y-scroll new mt-[-20px] md:mt-[-100px]">

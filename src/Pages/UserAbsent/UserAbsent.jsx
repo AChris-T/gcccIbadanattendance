@@ -7,9 +7,12 @@ import { ClipLoader } from 'react-spinners';
 const UserAbsent = () => {
   const [loader, setLoader] = useState(false);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [membersData, setMembersData] = useState([]);
+  const [membersLoading, setMembersLoading] = useState(false);
   const [currentDate, setCurrentDate] = useState('');
   const user = JSON.parse(localStorage.getItem('GCCC_ATTENDANCE'));
   const getAllUsersAttendanceURL = import.meta.env.VITE_APP_POST_DATA;
+  const getAllUsersURL = import.meta.env.VITE_APP_GET_DATA;
   const accessEmail =
     import.meta.env.VITE_APP_ACCESS_EMAIL || 'abiodunsamyemi@gmail.com';
   const showDownloadButton = accessEmail.includes(user?.Email);
@@ -87,6 +90,31 @@ const UserAbsent = () => {
       setLoader(false);
     }
   };
+
+  const fetchMembersData = async () => {
+    try {
+      setMembersLoading(true);
+      const response = await fetch(getAllUsersURL);
+      if (!response.ok) {
+        throw new Error('Failed to fetch members data from Google Sheets');
+      }
+      let data = await response.json();
+      if (data.data && Array.isArray(data.data)) {
+        data = data.data;
+      }
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid data format received from Google Sheets');
+      }
+      setMembersData(data);
+      toast.success(`Members data loaded! ${data.length} total members`);
+      setMembersLoading(false);
+    } catch (error) {
+      console.error('Error fetching members data:', error);
+      toast.error('Failed to fetch members data. Please try again.');
+      setMembersLoading(false);
+    }
+  };
+
   const handleDownloadAllData = () => {
     if (attendanceData.length === 0) {
       toast.info('Please fetch attendance data first');
@@ -131,6 +159,18 @@ const UserAbsent = () => {
     );
   };
 
+  const handleDownloadMembers = () => {
+    if (membersData.length === 0) {
+      toast.info('Please fetch members data first');
+      return;
+    }
+    const filename = `members-data-${dayjs().format('YYYY-MM-DD-HH-mm')}.csv`;
+    downloadCSV(membersData, filename);
+    toast.success(
+      `Members data (${membersData.length} records) downloaded successfully!`
+    );
+  };
+
   if (!showDownloadButton) {
     return null;
   }
@@ -154,6 +194,35 @@ const UserAbsent = () => {
             </div>
           </div>
         )} */}
+        <div className="flex flex-col gap-2 items-center bg-[#232c3d] p-4 rounded-lg">
+          <h3 className="text-lg text-white font-semibold mb-1">Total Members</h3>
+          <div className="flex items-center gap-3">
+            <span className="bg-[#2a3441] px-4 py-2 rounded text-white font-bold text-lg">
+              {membersData.length}
+            </span>
+            <button
+              onClick={fetchMembersData}
+              disabled={membersLoading}
+              className="flex items-center gap-2 px-4 py-2 bg-[#0094D3] text-white rounded-lg font-medium hover:bg-[#007bb3] disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              {membersLoading ? (
+                <>
+                  <ClipLoader size={16} color="#ffffff" />
+                  Loading Members...
+                </>
+              ) : (
+                'Load Members Data'
+              )}
+            </button>
+            <button
+              onClick={handleDownloadMembers}
+              disabled={membersData.length === 0}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              Download Members ({membersData.length})
+            </button>
+          </div>
+        </div>
         <div className="flex flex-col gap-3">
           <button
             onClick={fetchAttendanceData}
@@ -189,7 +258,7 @@ const UserAbsent = () => {
           </div>
         </div>
         <div className="text-center text-gray-400 text-xs">
-          <p>Download attendance data from Google Sheets</p>
+          <p>Download attendance and members data from Google Sheets</p>
         </div>
       </div>
     </div>
