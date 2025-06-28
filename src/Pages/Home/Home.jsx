@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import HandIcon from '../../assets/HandIcon';
 import CheckedIcon from '../../assets/CheckedIcon';
 import { ClipLoader } from 'react-spinners';
+import UserAbsent from '../UserAbsent/UserAbsent';
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isoWeek);
@@ -143,6 +144,7 @@ const Home = ({ isMarked, setIsMarked }) => {
               <p className="text-[32px] text-center text-white font-semibold">
                 Welcome To {current.day} Service!
               </p>
+              <UserAbsent />
             </>
           ) : null}
         </div>
@@ -190,9 +192,9 @@ const Home = ({ isMarked, setIsMarked }) => {
                       Hello 👋, {authUser['First Name']}
                     </p>
                     <p className="max-w-md text-center text-white">
-                      We do not have a church service today, but you
-                      can catch-up catch up with previous services on YouTube
-                      and download audio messages on Telegram.
+                      We do not have a church service today, but you can
+                      catch-up catch up with previous services on YouTube and
+                      download audio messages on Telegram.
                     </p>
 
                     <div className="flex flex-col gap-4 sm:flex-row">
@@ -213,6 +215,7 @@ const Home = ({ isMarked, setIsMarked }) => {
                         Download on Telegram
                       </a>
                     </div>
+                    <UserAbsent />
                   </div>
                 )
               ) : (
