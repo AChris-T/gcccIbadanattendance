@@ -55,6 +55,7 @@ function App() {
     try {
       const response = await fetch(getDataUrl);
       const users = await response.json();
+      console.log({ users })
       const lowercaseUsername = username.toLowerCase();
       const user = users.find(
         (user) =>
