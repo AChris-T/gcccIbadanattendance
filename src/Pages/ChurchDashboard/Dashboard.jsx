@@ -12,15 +12,22 @@ import Navbar from '../../Modals/Navbar';
 import { FaUserCheck } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { IoMdLogOut } from 'react-icons/io';
-import AttendanceIcon from '../../assets/AttendanceIcon';
 import { PiNoteFill } from 'react-icons/pi';
+import useAuthStore from '../../store/authStore';
+import { MdAdminPanelSettings } from 'react-icons/md';
 
 const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
   const [titleApp, setTitleApp] = useState('Home');
   const location = useLocation();
-  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const source = params.get('source');
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
+  const storeUser = useAuthStore((state) => state.user);
+
+  const handleLogout = () => {
+    logout();
+  };
 
   useEffect(() => {
     if (source === 'online') {
@@ -28,14 +35,6 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
     }
   }, [source]);
   const query = source === 'online' ? '?source=online' : '';
-  const handleClearLocalStorage = () => {
-    localStorage.removeItem('GCCC_ATTENDANCE');
-    window.location.reload();
-    navigate('/login');
-    toast.success('Have a nice day', {
-      position: 'top-right',
-    });
-  };
 
   return (
     <div
@@ -78,9 +77,21 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
               <PiNoteFill className="text-[24px]" />
               Attendance
             </NavLink>
+            {storeUser?.role === 'admin' && (
+              <NavLink
+                to={'/admin'}
+                className={({ isActive }) =>
+                  `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
+                    isActive ? 'text-white' : 'text-[#ffffffa8]'
+                  }`
+                }
+              >
+                <MdAdminPanelSettings className="text-[24px]" /> Admin
+              </NavLink>
+            )}
             <NavLink
               to={`/login${query}`}
-              onClick={handleClearLocalStorage}
+              onClick={handleLogout}
               className={({ isActive }) =>
                 `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
                   isActive ? 'text-white' : 'text-[#ffffffa8]'

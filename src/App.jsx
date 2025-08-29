@@ -25,108 +25,52 @@ import Give from './Pages/LandingPage/GivePage/Give';
 import Navbar from './Modals/Navbar';
 import HomeNavbar from './Modals/HomeNavbar';
 import Resources from './Pages/Resources/Resources';
-import AOS from 'aos';
 import 'aos/dist/aos.css';
+import ProtectedRoute from './Utils/ProtectedRoutes';
+import AdminPage from './Pages/Admin/AdminPage';
+import useAuthStore from './store/authStore';
+import { fetchProfile } from './services/authServices';
 
 function App() {
-  const [loggedInUser, setLoggedInUser] = useState(null);
-  const getDataUrl = import.meta.env.VITE_APP_GET_DATA;
-  const [isMarked, setIsMarked] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const setUser = useAuthStore((state) => state.setUser);
+  const setAuthFromToken = useAuthStore((state) => state.setAuthFromToken);
 
   useEffect(() => {
-    AOS.init();
-    const storedUser = localStorage.getItem('GCCC_ATTENDANCE');
-    const params = new URLSearchParams(location.search);
-    const source = params.get('source');
-
-    if (storedUser) {
-      setLoggedInUser(JSON.parse(storedUser));
-      if (source === 'online') {
-        navigate('/attendance?source=online');
-      } else {
-        navigate('/');
+    setAuthFromToken();
+    (async () => {
+      try {
+        const profileResponse = await fetchProfile();
+        const userData = profileResponse?.data?.user;
+        if (userData) setUser(userData);
+      } catch (err) {
+        // silently ignore if unauthenticated
       }
-    }
+    })();
   }, []);
-
-  const handleLogin = async (username, password) => {
-    try {
-      const response = await fetch(getDataUrl);
-      const users = await response.json();
-      console.log({ users })
-      const lowercaseUsername = username.toLowerCase();
-      const user = users.find(
-        (user) =>
-          user.Email.toLowerCase() === lowercaseUsername ||
-          user['Phone Number'] === username
-      );
-
-      if (user) {
-        setLoggedInUser(user);
-        localStorage.setItem('GCCC_ATTENDANCE', JSON.stringify(user));
-
-        toast.success('Login successful', {
-          position: 'top-right',
-        });
-        const params = new URLSearchParams(location.search);
-        const source = params.get('source');
-
-        if (source === 'online') {
-          navigate('/attendance?source=online');
-        } else {
-          navigate('/');
-        }
-      } else {
-        toast.error('Invalid Email/Phone Number', {
-          position: 'top-right',
-        });
-      }
-    } catch (error) {
-      toast.error(error.message || 'An error occurred', {
-        position: 'top-right',
-      });
-    }
-  };
-
-  const ProtectedRoute = ({ element, ...rest }) => {
-    return loggedInUser ? element : <Navigate to="/login" />;
-  };
 
   return (
     <>
       <Routes>
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute
-              element={
-                <Dashboard
-                  user={loggedInUser}
-                  isMarked={isMarked}
-                  setIsMarked={setIsMarked}
-                />
-              }
-            />
-          }
-        >
-          <Route
-            path="/"
-            element={<Home isMarked={isMarked} setIsMarked={setIsMarked} />}
-          />
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<ProtectedRoute element={<Dashboard />} />}>
+          <Route path="/" element={<Home />} />
           <Route path="/attendance" element={<Attendance />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute
+                allowedRoles={['admin']}
+                element={<AdminPage />}
+              />
+            }
+          />
         </Route>
         <Route
           path="*"
           element={
             <div className="flex flex-col gap-6 items-center justify-center w-full h-[100vh]">
               <h1 className="text-2xl font-bold">Error 404: Page Not Found.</h1>
-              <button
-                className="px-6 py-4 text-lg text-white bg-purple-600 border rounded-lg"
-                onClick={() => navigate('/?source=404')}
-              >
+              <button className="px-6 py-4 text-lg text-white bg-purple-600 border rounded-lg">
                 Back to Home
               </button>
             </div>
