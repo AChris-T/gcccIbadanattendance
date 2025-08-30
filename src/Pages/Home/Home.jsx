@@ -23,7 +23,7 @@ dayjs.extend(isoWeek);
 
 const Home = () => {
   const storeUser = useAuthStore((state) => state.user);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [state, setState] = useState({
     serviceDayId: null,
@@ -42,12 +42,20 @@ const Home = () => {
     email: storeUser?.email,
   };
 
+  // check if this user has marked attendance today
   useEffect(() => {
-    const attendanceDate = localStorage.getItem('attendance_date');
-    if (attendanceDate && dayjs(attendanceDate).isSame(dayjs(), 'day')) {
+    const records =
+      JSON.parse(localStorage.getItem('attendance_records')) || [];
+    const today = dayjs().format('YYYY-MM-DD');
+
+    const userMarkedToday = records.some(
+      (record) => record.email === storeUser?.email && record.date === today
+    );
+
+    if (userMarkedToday) {
       setState((prev) => ({ ...prev, hasMarkedToday: true }));
     }
-  }, []);
+  }, [storeUser?.email]);
 
   useEffect(() => {
     const loadServiceDay = async () => {
@@ -90,15 +98,23 @@ const Home = () => {
 
       const response = await submitServiceAttendance(payload);
       toast.success(response?.message || 'Attendance submitted successfully');
-      const attendanceDate =
-        response?.message?.date?.attendance_date ||
-        dayjs().format('YYYY-MM-DD');
-      localStorage.setItem('attendance_date', attendanceDate);
 
-      if (dayjs(attendanceDate).isSame(dayjs(), 'day')) {
-        setState((prev) => ({ ...prev, hasMarkedToday: true }));
-      }
-      navigate('/attendance')
+      const today = dayjs().format('YYYY-MM-DD');
+      const timeNow = dayjs().format('hh:mm A');
+
+      const records =
+        JSON.parse(localStorage.getItem('attendance_records')) || [];
+
+      records.push({
+        email: storeUser?.email,
+        date: today,
+        time: timeNow,
+      });
+
+      localStorage.setItem('attendance_records', JSON.stringify(records));
+
+      setState((prev) => ({ ...prev, hasMarkedToday: true }));
+      navigate('/attendance');
     } catch (error) {
       toast.error(error?.message || 'Attendance submission failed');
     } finally {
@@ -106,10 +122,17 @@ const Home = () => {
     }
   };
 
+  const todayTime =
+    JSON.parse(localStorage.getItem('attendance_records'))?.find(
+      (record) =>
+        record.email === storeUser?.email &&
+        record.date === dayjs().format('YYYY-MM-DD')
+    )?.time || '---';
+
   return (
-    <div className="w-full px-2 min-h-screen flex justify-center items-center">
-      <div className="flex gap-3 flex-col items-center mb-5">
-        <p className="text-base text-white capitalize my-4">
+    <div className="flex items-center justify-center w-full min-h-screen px-2">
+      <div className="flex flex-col items-center gap-3 mb-5">
+        <p className="my-4 text-base text-white capitalize">
           Hello 👋, {profile?.firstName ?? 'Friend'}
         </p>
 
@@ -131,10 +154,10 @@ const Home = () => {
                     <h3 className="text-center text-white">
                       Attendance Already Taken Today
                     </h3>
+                    <p className="mt-2 text-sm text-white">Time: {todayTime}</p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center">
-                    {' '}
                     <div className="bg-[#3A4D70] rounded-full animate-pulse delay-150">
                       <motion.div
                         onClick={handleButtonClick}
@@ -148,19 +171,17 @@ const Home = () => {
                           type: 'spring',
                         }}
                       >
-                        {' '}
-                        <span className="absolute inset-1 rounded-full border-4 border-[#202a46] opacity-90 animate-ping delay-1000"></span>{' '}
-                        <span className="absolute inset-1 rounded-full border-4 border-[#172346] opacity-90 animate-ping delay-10000"></span>{' '}
-                        <HandIcon />{' '}
-                      </motion.div>{' '}
-                    </div>{' '}
-                    <div className="text-center my-3">
+                        <span className="absolute inset-1 rounded-full border-4 border-[#202a46] opacity-90 animate-ping delay-1000"></span>
+                        <span className="absolute inset-1 rounded-full border-4 border-[#172346] opacity-90 animate-ping delay-10000"></span>
+                        <HandIcon />
+                      </motion.div>
+                    </div>
+                    <div className="my-3 text-center">
                       <p className="my-3 text-sm font-semibold text-white">
-                        {' '}
-                        Clock In Time{' '}
-                      </p>{' '}
-                      <p className="text-white">---</p>{' '}
-                    </div>{' '}
+                        Clock In Time
+                      </p>
+                      <p className="text-white">{todayTime}</p>
+                    </div>
                   </div>
                 )}
               </div>
