@@ -71,7 +71,7 @@ const Login = () => {
                     placeholder="Email or Phone Number"
                     required
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full  focus:outline-none py-[13px]  border-b-[1.8px] text-white bg-transparent"
+                    className="w-full  focus:outline-none py-[13px] px-2 rounded border-b-[1.8px] text-white bg-transparent"
                   />
                 </div>
                 <div>
@@ -85,7 +85,7 @@ const Login = () => {
                     placeholder="Password"
                     required
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full  focus:outline-none py-[13px]  border-b-[1.8px] text-white bg-transparent"
+                    className="w-full  focus:outline-none py-[13px] px-2 rounded border-b-[1.8px] text-white bg-transparent"
                   />
                 </div>
                 <button

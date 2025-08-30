@@ -16,12 +16,14 @@ import {
   fetchServiceDay,
   submitServiceAttendance,
 } from '../../services/dashboardServices';
+import { useNavigate } from 'react-router';
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isoWeek);
 
 const Home = () => {
   const storeUser = useAuthStore((state) => state.user);
+  const navigate = useNavigate()
 
   const [state, setState] = useState({
     serviceDayId: null,
@@ -87,9 +89,7 @@ const Home = () => {
       };
 
       const response = await submitServiceAttendance(payload);
-      toast.success(response?.message || 'Attendance submitted successfully', {
-        duration: 2000,
-      });
+      toast.success(response?.message || 'Attendance submitted successfully');
       const attendanceDate =
         response?.message?.date?.attendance_date ||
         dayjs().format('YYYY-MM-DD');
@@ -98,6 +98,7 @@ const Home = () => {
       if (dayjs(attendanceDate).isSame(dayjs(), 'day')) {
         setState((prev) => ({ ...prev, hasMarkedToday: true }));
       }
+      navigate('/attendance')
     } catch (error) {
       toast.error(error?.message || 'Attendance submission failed');
     } finally {
@@ -106,10 +107,10 @@ const Home = () => {
   };
 
   return (
-    <div className="w-full px-2 mt-[70px]">
-      <div className="flex gap-3 flex-col items-center mb-[70px]">
-        <p className="text-base text-white capitalize">
-          Hello 👋, {profile.firstName ?? 'Friend'}
+    <div className="w-full px-2 min-h-screen flex justify-center items-center">
+      <div className="flex gap-3 flex-col items-center mb-5">
+        <p className="text-base text-white capitalize my-4">
+          Hello 👋, {profile?.firstName ?? 'Friend'}
         </p>
 
         {state.status === 'loading' ? (
@@ -153,7 +154,7 @@ const Home = () => {
                         <HandIcon />{' '}
                       </motion.div>{' '}
                     </div>{' '}
-                    <div className="text-center">
+                    <div className="text-center my-3">
                       <p className="my-3 text-sm font-semibold text-white">
                         {' '}
                         Clock In Time{' '}

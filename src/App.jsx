@@ -15,7 +15,7 @@ import Dashboard from './Pages/ChurchDashboard/Dashboard';
 import Events from './Pages/Events/Events';
 import LandingPage from './Pages/LandingPage/HomePage/Home';
 import Home from './Pages/Home/Home';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import About from './Pages/LandingPage/AboutPage/Aboutpage';
 import Forms from './Pages/LandingPage/Formspage/Formspage';
@@ -77,7 +77,11 @@ function App() {
           }
         />
       </Routes>
-      <ToastContainer />
+      <ToastContainer position="top-right"
+        autoClose={3000}
+        hideProgressBar={true}
+        closeOnClick={true}
+      />
     </>
   );
 }
