@@ -19,7 +19,7 @@
     "@mui/material": "^5.15.10",
     "@table-library/react-table-library": "^4.1.7",
     "aos": "^2.3.4",
-    "axios": "^1.6.7",
+    "axios": "^1.11.0",
     "cookies": "^0.9.1",
     "dayjs": "^1.11.10",
     "framer-motion": "^12.9.2",

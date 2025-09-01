@@ -1,3 +1,4 @@
+import axios from 'axios';
 import Cookies from 'js-cookie';
 import { VITE_API_URL } from '../config/api';
 
@@ -12,23 +13,25 @@ export async function authClient(
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
-  const config = {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  };
+  try {
+    const response = await axios({
+      url: `${VITE_API_URL}${endpoint}`,
+      method,
+      headers,
+      data: body || undefined,
+    });
 
-  const res = await fetch(`${VITE_API_URL}${endpoint}`, config);
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Request failed with status ${res.status}`);
-  }
-
-  const contentType = res.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
-    return res.json();
-  } else {
-    return res.text();
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        error.response.data?.message ||
+          `Request failed with status ${error.response.status}`
+      );
+    } else if (error.request) {
+      throw new Error('No response received from server');
+    } else {
+      throw new Error(error.message);
+    }
   }
 }
