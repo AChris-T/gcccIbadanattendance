@@ -34,7 +34,7 @@ const Home = () => {
   });
 
   const params = new URLSearchParams(location.search);
-  const source = params.get('source') || 'online';
+  const source = params.get('source') || 'onsite';
 
   const profile = {
     firstName: storeUser?.first_name,

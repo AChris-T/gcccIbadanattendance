@@ -1,4 +1,4 @@
-import { useState } from "react";
+/* import { useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { NavLink, useNavigate } from "react-router-dom"
 
@@ -62,7 +62,7 @@ const Register = () => {
 
   return (
     <div className=" max-w-[1300px]  bg-[#FAFAF9] mx-auto shadow-card overflow-x-hidden">
-      <div className="px-2 container flex justify-center items-center">
+      <div className="container flex items-center justify-center px-2">
         <div className="outer">
           <ToastContainer />
         </div>
@@ -76,7 +76,7 @@ const Register = () => {
             <input type="email" name='email' onChange={getData} className="px-4 placeholder-blue-300 py-[16px] rounded-lg border-[1.8px] border-blue-400" />
             <label>Password:</label>
             <input type="password" name='password' onChange={getData} className="px-4 focus:border-blue-500 placeholder-gray-600 py-[16px] rounded-lg border-[1.8px] border-blue-400" />
-            {/*  <div className="flex justify-between  mt-2">
+            {/*  <div className="flex justify-between mt-2">
                <div className="flex items-center gap-1">
                 <input type="checkbox" className=""/>
                 <span className="text-[px2rem(12)]">Remenber Me</span>
@@ -84,8 +84,8 @@ const Register = () => {
                <div>
                 <span  className="text-[px2rem(12)] text-blue-500 underline cursor-pointer">Forget password?</span>
                </div>
-              </div> */}
-            <div className="w-full flex justify-center">
+              </div> 
+            <div className="flex justify-center w-full">
               <button onClick={handleSubmit} className="mt-2 rounded-lg border-[1.8px]  hover:bg-blue-400 bg-blue-500  text-[#fff] text-[20px] border-blue-500 w-full py-3 flex justify-center font-normal">
                 {isLoading ? <ClipLoader size={20} color="#fff" /> : "Submit"}
               </button>
@@ -100,3 +100,4 @@ const Register = () => {
 }
 
 export default Register
+ */

@@ -99,7 +99,7 @@ const Login = () => {
                     <span>Sign in</span>
                   )}
                 </button>
-                <p className="flex w-full text-white railway text-[14px]  justify-center  items-center">
+                {/*  <p className="flex w-full text-white railway text-[14px]  justify-center  items-center">
                   Dont have an account?
                   <a
                     href="https://docs.google.com/forms/d/e/1FAIpQLScZ48ojbVzUIjByfLBxO7aSG9GUiyNFKXwD7XiJqTFVNtjdrw/viewform?usp=sf_link"
@@ -109,7 +109,7 @@ const Login = () => {
                   >
                     Register
                   </a>
-                </p>
+                </p> */}
               </form>
             </div>
           </div>

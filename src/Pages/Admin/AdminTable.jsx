@@ -23,12 +23,11 @@ export default function AdminTable() {
       const memberAttendanceDate = member.attendance_date
         ? dayjs(member.attendance_date).format('YYYY-MM-DD')
         : null;
-
       const isAbsent =
         memberAttendanceDate === selectedDateStr &&
         (member.status === 'absent' || member.status === 'Absent');
-
-      if (!isAbsent) return false;
+    
+        if (!isAbsent) return false;
 
       const firstName = (member.first_name || '').toLowerCase();
       const lastName = (member.last_name || '').toLowerCase();
@@ -58,13 +57,13 @@ export default function AdminTable() {
   useEffect(() => {
     async function fetchMembers() {
       const res = await ALLATTENDANCEMEMBER();
-      setState(prev => ({ ...prev, members: res.data || [] }));
+      setState((prev) => ({ ...prev, members: res.data || [] }));
     }
     fetchMembers();
   }, []);
 
   useEffect(() => {
-    setState(prev => ({ ...prev, currentPage: 1 }));
+    setState((prev) => ({ ...prev, currentPage: 1 }));
   }, [state.selectedDate, state.search, state.itemsPerPage]);
 
   const handleDownloadCSV = () => {
@@ -76,15 +75,15 @@ export default function AdminTable() {
   };
 
   const handleDateChange = (e) => {
-    setState(prev => ({ ...prev, selectedDate: e.target.value }));
+    setState((prev) => ({ ...prev, selectedDate: e.target.value }));
   };
 
   const handleItemsPerPageChange = (e) => {
-    setState(prev => ({ ...prev, itemsPerPage: Number(e.target.value) }));
+    setState((prev) => ({ ...prev, itemsPerPage: Number(e.target.value) }));
   };
 
   const handlePageChange = (newPage) => {
-    setState(prev => ({ ...prev, currentPage: newPage }));
+    setState((prev) => ({ ...prev, currentPage: newPage }));
   };
 
   return (
@@ -203,7 +202,9 @@ export default function AdminTable() {
             <div className="flex items-center gap-2">
               <button
                 className="px-3 py-1 text-sm text-white bg-[#23233a] border border-[#444466] rounded disabled:opacity-50"
-                onClick={() => handlePageChange(Math.max(1, state.currentPage - 1))}
+                onClick={() =>
+                  handlePageChange(Math.max(1, state.currentPage - 1))
+                }
                 disabled={state.currentPage === 1}
               >
                 Prev
@@ -213,7 +214,9 @@ export default function AdminTable() {
               </span>
               <button
                 className="px-3 py-1 text-sm text-white bg-[#23233a] border border-[#444466] rounded disabled:opacity-50"
-                onClick={() => handlePageChange(Math.min(totalPages, state.currentPage + 1))}
+                onClick={() =>
+                  handlePageChange(Math.min(totalPages, state.currentPage + 1))
+                }
                 disabled={state.currentPage === totalPages}
               >
                 Next
