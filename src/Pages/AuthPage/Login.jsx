@@ -35,9 +35,8 @@ const Login = () => {
       toast.success('Login successful');
       navigate('/');
     } catch (error) {
-      console.log(error.message);
+      toast.error(error.message);
       const err = JSON.parse(error.message);
-      console.log(err);
       toast.error(err.message || 'Login failed');
     } finally {
       setLoading(false);
