@@ -8,7 +8,6 @@ import Lottie from 'lottie-react';
 import animationData from '../../assets/Animation.json';
 import { motion } from 'framer-motion';
 import HandIcon from '../../assets/HandIcon';
-import UserAbsent from '../UserAbsent/UserAbsent';
 import useAuthStore from '../../store/authStore';
 import CheckedIcon from '../../assets/CheckedIcon';
 import {
@@ -154,7 +153,6 @@ const Home = () => {
                 Download on Telegram
               </a>
             </div>
-            <UserAbsent />
           </div>
         </div>
       </div>

@@ -3,29 +3,12 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import Login from '../src/Pages/AuthPage/Login';
-import {
-  Navigate,
-  Route,
-  Routes,
-  useNavigate,
-  useLocation,
-} from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Attendance from './Pages/Attendance/Attendance';
 import Dashboard from './Pages/ChurchDashboard/Dashboard';
-import Events from './Pages/Events/Events';
-import LandingPage from './Pages/LandingPage/HomePage/Home';
 import Home from './Pages/Home/Home';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import About from './Pages/LandingPage/AboutPage/Aboutpage';
-import Forms from './Pages/LandingPage/Formspage/Formspage';
-import HomeDetails from './Pages/LandingPage/HomeDetails/HomeDetails';
-import Stream from './Pages/LandingPage/StreamPage.jsx/Stream';
-import Give from './Pages/LandingPage/GivePage/Give';
-import Navbar from './Modals/Navbar';
-import HomeNavbar from './Modals/HomeNavbar';
-import Resources from './Pages/Resources/Resources';
-import 'aos/dist/aos.css';
 import ProtectedRoute from './Utils/ProtectedRoutes';
 import AdminPage from './Pages/Admin/AdminPage';
 import useAuthStore from './store/authStore';
@@ -77,7 +60,8 @@ function App() {
           }
         />
       </Routes>
-      <ToastContainer position="top-right"
+      <ToastContainer
+        position="top-right"
         autoClose={3000}
         hideProgressBar={true}
         closeOnClick={true}
