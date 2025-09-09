@@ -13,6 +13,7 @@ import ProtectedRoute from './Utils/ProtectedRoutes';
 import AdminPage from './Pages/Admin/AdminPage';
 import useAuthStore from './store/authStore';
 import { fetchProfile } from './services/authServices';
+import Formspage from './Pages/ChurchDashboard/Formpages';
 
 function App() {
   const setUser = useAuthStore((state) => state.setUser);
@@ -38,6 +39,7 @@ function App() {
         <Route path="/" element={<ProtectedRoute element={<Dashboard />} />}>
           <Route path="/" element={<Home />} />
           <Route path="/attendance" element={<Attendance />} />
+          <Route path="/form" element={<Formspage />} />
           <Route
             path="/admin"
             element={

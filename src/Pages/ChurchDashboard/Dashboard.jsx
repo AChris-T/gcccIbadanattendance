@@ -77,6 +77,17 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
               <PiNoteFill className="text-[24px]" />
               Attendance
             </NavLink>
+            <NavLink
+              to={`/form${query}`}
+              className={({ isActive }) =>
+                `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
+                  isActive ? 'text-white' : 'text-[#ffffffa8]'
+                }`
+              }
+            >
+              <PiNoteFill className="text-[24px]" />
+              Forms
+            </NavLink>
             {storeUser?.role === 'admin' && (
               <NavLink
                 to={'/admin'}
