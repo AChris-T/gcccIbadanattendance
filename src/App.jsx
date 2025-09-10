@@ -1,21 +1,20 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
-import './App.css';
-import { useState, useEffect } from 'react';
-import Login from '../src/Pages/AuthPage/Login';
-import { Route, Routes } from 'react-router-dom';
-import Attendance from './Pages/Attendance/Attendance';
-import Dashboard from './Pages/ChurchDashboard/Dashboard';
-import Home from './Pages/Home/Home';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import ProtectedRoute from './Utils/ProtectedRoutes';
-import AdminPage from './Pages/Admin/AdminPage';
+import NotFound from './pages/OtherPage/NotFound';
+import { ScrollToTop } from './components/common/ScrollToTop';
+import Attendance from './pages/Attendance/Attendance';
+import Dashboard from './pages/ChurchDashboard/Dashboard';
+import Home from './pages/Home/Home';
+import AdminHome from './pages/Dashboard/Home';
+import AppLayout from './layout/AppLayout';
+import { useEffect } from 'react';
 import useAuthStore from './store/authStore';
+import ProtectedRoute from './Utils/ProtectedRoutes.jsx';
 import { fetchProfile } from './services/authServices';
-import Formspage from './Pages/ChurchDashboard/Formpages';
+import Login from './pages/AuthPage/Login';
+import { ToastContainer } from 'react-toastify';
+import { Route, Routes } from 'react-router';
+import Formspage from './pages/ChurchDashboard/FormPage.jsx';
 
-function App() {
+export default function App() {
   const setUser = useAuthStore((state) => state.setUser);
   const setAuthFromToken = useAuthStore((state) => state.setAuthFromToken);
 
@@ -34,34 +33,30 @@ function App() {
 
   return (
     <>
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={<Login />} />
+
+        {/* Protected Dashboard Routes */}
         <Route path="/" element={<ProtectedRoute element={<Dashboard />} />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/attendance" element={<Attendance />} />
-          <Route path="/form" element={<Formspage />} />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute
-                allowedRoles={['admin']}
-                element={<AdminPage />}
-              />
-            }
-          />
+          <Route index element={<Home />} />
+          <Route path="attendance" element={<Attendance />} />
+          <Route path="form" element={<Formspage />} />
         </Route>
         <Route
-          path="*"
+          path="admin"
           element={
-            <div className="flex flex-col gap-6 items-center justify-center w-full h-[100vh]">
-              <h1 className="text-2xl font-bold">Error 404: Page Not Found.</h1>
-              <button className="px-6 py-4 text-lg text-white bg-purple-600 border rounded-lg">
-                Back to Home
-              </button>
-            </div>
+            <ProtectedRoute allowedRoles={['admin']} element={<AppLayout />} />
           }
-        />
+        >
+          <Route index element={<AdminHome />} />
+        </Route>
+
+        {/* Catch-all Not Found */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
+
+      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -72,4 +67,33 @@ function App() {
   );
 }
 
-export default App;
+{
+  /* Dashboard Layout *
+          <Route element={<AppLayout />}>
+            <Route index path="/" element={<Home />} />
+
+            <Route path="/profile" element={<UserProfiles />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/blank" element={<Blank />} />
+
+            <Route path="/form-elements" element={<FormElements />} />
+
+            <Route path="/basic-tables" element={<BasicTables />} />
+
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/avatars" element={<Avatars />} />
+            <Route path="/badge" element={<Badges />} />
+            <Route path="/buttons" element={<Buttons />} />
+            <Route path="/images" element={<Images />} />
+            <Route path="/videos" element={<Videos />} />
+
+            {/* Charts 
+            <Route path="/line-chart" element={<LineChart />} />
+            <Route path="/bar-chart" element={<BarChart />} />
+          </Route>
+            */
+}
+
+{
+  /* Fallback Route */
+}

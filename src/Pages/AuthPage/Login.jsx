@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import logo from '../../assets/Images/gcc.png';
 import { ClipLoader } from 'react-spinners';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { loginUser } from '../../services/authServices';
 import useAuthStore from '../../store/authStore';
 
@@ -13,6 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const login = useAuthStore((state) => state.login);
 
@@ -33,7 +34,11 @@ const Login = () => {
       const data = await loginUser({ username, password: formattedPassword });
       login(data.data.user, data.data.token);
       toast.success('Login successful');
-      navigate('/');
+      const searchParams = new URLSearchParams(location.search);
+      const returnTo = searchParams.get('returnTo');
+      const fallbackTarget = `/${location.search ?? ''}`; // preserves ?source if present on /login
+      const target = returnTo ? decodeURIComponent(returnTo) : fallbackTarget;
+      navigate(target, { replace: true });
     } catch (error) {
       toast.error(error.message);
       const err = JSON.parse(error.message);

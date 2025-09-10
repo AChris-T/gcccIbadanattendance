@@ -94,7 +94,7 @@ const Home = () => {
         canMark: refresh.data.can_mark || false,
       }));
 
-      navigate('/attendance');
+      navigate(`/attendance${location.search}`);
     } catch (error) {
       toast.error(error?.message || 'Attendance submission failed');
     } finally {

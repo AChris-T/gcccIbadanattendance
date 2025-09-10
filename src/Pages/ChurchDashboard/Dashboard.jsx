@@ -8,13 +8,13 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
-import Navbar from '../../Modals/Navbar';
 import { FaUserCheck } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { IoMdLogOut } from 'react-icons/io';
 import { PiNoteFill } from 'react-icons/pi';
 import useAuthStore from '../../store/authStore';
 import { MdAdminPanelSettings } from 'react-icons/md';
+import Navbar from '../Modals/Navbar';
 
 const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
   const [titleApp, setTitleApp] = useState('Home');
@@ -35,6 +35,7 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
     }
   }, [source]);
   const query = source === 'online' ? '?source=online' : '';
+  const returnTo = encodeURIComponent(`${location.pathname}${location.search}`);
 
   return (
     <div
@@ -101,7 +102,7 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
               </NavLink>
             )}
             <NavLink
-              to={`/login${query}`}
+              to={`/login${query ? `${query}&` : '?'}returnTo=${returnTo}`}
               onClick={handleLogout}
               className={({ isActive }) =>
                 `flex flex-col items-center rounded gap-[8px] h-[48px] px-2 text-[12px] font-medium ${
