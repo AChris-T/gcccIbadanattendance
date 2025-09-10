@@ -1,5 +1,5 @@
-import NotFound from './pages/OtherPage/NotFound';
-import { ScrollToTop } from './components/common/ScrollToTop';
+/* import NotFound from './pages/OtherPage/NotFound';
+ */ import { ScrollToTop } from './components/common/ScrollToTop';
 import Attendance from './pages/Attendance/Attendance';
 import Dashboard from './pages/ChurchDashboard/DashboardPage';
 import Home from './pages/Home/Home';
@@ -52,8 +52,9 @@ export default function App() {
           <Route index element={<AdminHome />} />
         </Route>
 
-        {/* Catch-all Not Found */}
+        {/* Catch-all Not Found 
         <Route path="*" element={<NotFound />} />
+        */}
       </Routes>
 
       {/* Toast Notifications */}
