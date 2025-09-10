@@ -16,7 +16,7 @@ import useAuthStore from '../../store/authStore';
 import { MdAdminPanelSettings } from 'react-icons/md';
 import Navbar from '../Modals/Navbar';
 
-const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
+const DashboardPage = ({ isMarked, setIsMarked, attendanceType }) => {
   const [titleApp, setTitleApp] = useState('Home');
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -121,4 +121,4 @@ const Dashboard = ({ isMarked, setIsMarked, attendanceType }) => {
   );
 };
 
-export default Dashboard;
+export default DashboardPage;

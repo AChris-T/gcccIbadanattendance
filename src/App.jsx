@@ -1,7 +1,7 @@
 import NotFound from './pages/OtherPage/NotFound';
 import { ScrollToTop } from './components/common/ScrollToTop';
 import Attendance from './pages/Attendance/Attendance';
-import Dashboard from './pages/ChurchDashboard/Dashboard';
+import Dashboard from './pages/ChurchDashboard/DashboardPage';
 import Home from './pages/Home/Home';
 import AdminHome from './pages/Dashboard/Home';
 import AppLayout from './layout/AppLayout';
