@@ -52,9 +52,9 @@ export default function App() {
           <Route index element={<AdminHome />} />
         </Route>
 
-        {/* Catch-all Not Found 
+        {/* Catch-all Not Found
+         */}
         <Route path="*" element={<NotFound />} />
-        */}
       </Routes>
 
       {/* Toast Notifications */}
