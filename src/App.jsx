@@ -1,18 +1,18 @@
-import NotFound from './pages/OtherPage/NotFound';
+import NotFound from './Pages/OtherPage/NotFound';
 import { ScrollToTop } from './components/common/ScrollToTop';
-import Attendance from './pages/Attendance/Attendance';
-import Dashboard from './pages/ChurchDashboard/DashboardPage';
-import Home from './pages/Home/Home';
-import AdminHome from './pages/Dashboard/Home';
+import Attendance from './Pages/Attendance/Attendance';
+import Dashboard from './Pages/ChurchDashboard/DashboardPage';
+import Home from './Pages/Home/Home';
+import AdminHome from './Pages/Dashboard/Home';
 import AppLayout from './layout/AppLayout';
 import { useEffect } from 'react';
 import useAuthStore from './store/authStore';
 import ProtectedRoute from './Utils/ProtectedRoutes.jsx';
 import { fetchProfile } from './services/authServices';
-import Login from './pages/AuthPage/Login';
+import Login from './Pages/AuthPage/Login';
 import { ToastContainer } from 'react-toastify';
 import { Route, Routes } from 'react-router';
-import Formspage from './pages/ChurchDashboard/FormPage.jsx';
+import Formspage from './Pages/ChurchDashboard/FormPage.jsx';
 
 export default function App() {
   const setUser = useAuthStore((state) => state.setUser);
